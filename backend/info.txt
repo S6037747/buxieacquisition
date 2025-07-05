@@ -1,0 +1,5 @@
+https://app.brevo.com/settings/keys/smtp
+
+https://cloud.mongodb.com/v2#/org/686565f51bbdb847a85c969d/
+
+https://www.youtube.com/watch?v=7BTsepZ9xp8&t=6748s

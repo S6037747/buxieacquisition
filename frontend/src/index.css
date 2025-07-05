@@ -1,0 +1,34 @@
+@import "tailwindcss";
+
+* {
+  font-family: system-ui, sans-serif !important;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  font-family: system-ui, sans-serif !important;
+  font-size: 1rem !important; /* Adjust as needed */
+  -webkit-text-fill-color: #000 !important;
+  box-shadow: 0 0 0 1000px white inset !important;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+/* --- shake animation --------------------------------------------------- */
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
+}
+
+.animate-shake {
+  animation: shake 0.3s ease-in-out;
+}
