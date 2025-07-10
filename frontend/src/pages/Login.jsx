@@ -1,16 +1,155 @@
 import React, { useState } from "react";
 import { assets } from "../assets/assets";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useContext } from "react";
+import { AppContext } from "../context/AppContext";
+import { useEffect } from "react";
+import LoginForm from "../components/login/LoginForm";
+import QrcodeSetup from "../components/login/QrcodeSetup";
+import TwoFactorForm from "../components/login/TwoFactorForm";
 
 const Login = () => {
+  const { backendUrl, isLoggedin } = useContext(AppContext);
   const [passwordState, setPasswordState] = useState("hidden");
+  const [qrCode, setQrcode] = useState("");
+  const [totpSecret, setTotpSecret] = useState("");
+  const [email, setEmail] = useState("");
+  const [totp, setTotp] = useState("");
+  const [totpReq, setTotpReq] = useState(false);
+  const [password, setPassword] = useState("");
+  const [shake, setShake] = useState(false);
+  const [error, setError] = useState("");
+  const [totpActive, setTotpActive] = useState(false);
+
+  const triggerError = (msg) => {
+    setError(msg);
+    setShake(false);
+    requestAnimationFrame(() => setShake(true));
+  };
+
+  const inputRefs = React.useRef([]);
+
+  const handleInput = (e, index) => {
+    const val = e.target.value.replace(/[^0-9]/g, ""); // keep only digits
+    e.target.value = val;
+    if (val && index < inputRefs.current.length - 1) {
+      inputRefs.current[index + 1].focus();
+    }
+  };
+
+  const handleKeyDown = (e, index) => {
+    if (e.key === "Backspace" && e.target.value === "" && index > 0) {
+      inputRefs.current[index - 1].focus();
+    }
+  };
+
+  const handlePaste = (e) => {
+    const paste = e.clipboardData.getData("text").replace(/[^0-9]/g, "");
+    paste
+      .split("")
+      .slice(0, 6)
+      .forEach((char, idx) => {
+        if (inputRefs.current[idx]) inputRefs.current[idx].value = char;
+      });
+  };
 
   const navigate = useNavigate();
+
+  const loginHandler = async (e) => {
+    if (e) e.preventDefault();
+
+    const localEnteredCode = inputRefs.current
+      .map((ref) => ref?.value)
+      .join("");
+
+    if (!password || !email) {
+      return triggerError("Fill in login credentials");
+    }
+
+    setEmail(email.trim().toLowerCase());
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      return triggerError("Please enter a valid email address.");
+
+    if (totpReq && localEnteredCode.length < 6) {
+      return triggerError("2FA code must be filled in.");
+    }
+    setTotp(localEnteredCode);
+
+    try {
+      const { data } = await axios.post(`${backendUrl}/api/auth/login`, {
+        email,
+        password,
+        totp: localEnteredCode,
+      });
+
+      if (data.totpReq && !totpReq) {
+        setTotpReq(true);
+      }
+
+      if (data.totpActive) {
+        setTotpActive(true);
+      }
+
+      if (!data.success && !data.qrCode && totpReq) {
+        return triggerError(data.message);
+      }
+
+      if (data.qrCode) {
+        setTotpSecret(data.totpSecret);
+        setQrcode(data.qrCode);
+        return;
+      }
+
+      if (!data.success) {
+        return triggerError(data.message);
+      }
+
+      if (data.success) {
+        window.location.reload();
+      }
+    } catch (error) {
+      return triggerError(error.message || "Something went wrong.");
+    }
+  };
+
+  const handleTotpLost = async () => {
+    try {
+      const { data } = await axios.post(`${backendUrl}/api/auth/login`, {
+        email,
+        password,
+        totp,
+        totpLost: true,
+      });
+
+      if (data.qrCode) {
+        setTotpSecret(data.totpSecret);
+        setQrcode(data.qrCode);
+        setTotpReq(false);
+        setError("");
+      } else if (data.totpReq) {
+        setTotpReq(true);
+      } else if (data.message) {
+        triggerError(data.message);
+      }
+    } catch (error) {
+      triggerError(error.message || "Something went wrong.");
+    }
+  };
+
+  useEffect(() => {
+    if (totpReq && inputRefs.current[0]) {
+      inputRefs.current[0].focus();
+    }
+    setError("");
+    if (isLoggedin && navigate("/dashboard"));
+  }, [totpReq, qrCode, isLoggedin]);
 
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Left Panel */}
-      <div className="relative w-full md:w-1/2 flex flex-col justify-center items-center px-4 sm:px-10">
+      <div className="relative w-full md:w-1/2 flex flex-col justify-center items-center px-4 sm:px-10 pt-20">
         <img
           src={assets.buixie_logo}
           alt="Logo"
@@ -20,68 +159,49 @@ const Login = () => {
         {/* Form Container */}
         <div className="w-full max-w-md">
           <h1 className="text-3xl font-bold mb-2">Login</h1>
-          <p className="mb-6 text-gray-500">
+          <p className="mb-6 text-black-500">
             Buixie Business Relationship Management System
           </p>
+          {!totpReq && qrCode !== "" && (
+            <QrcodeSetup
+              qrCode={qrCode}
+              totpSecret={totpSecret}
+              error={error}
+              shake={shake}
+              setQrcode={setQrcode}
+              setTotpReq={setTotpReq}
+            />
+          )}
 
-          <form className="space-y-4">
-            {/* E-mail */}
-            <div>
-              <label className="text-sm text-black">E-mail</label>
-              <div className="flex items-center border rounded px-3 py-2">
-                <input
-                  type="email"
-                  placeholder="example@email.com"
-                  className="bg-transparent outline-none w-full"
-                />
-                <img src={assets.mail_icon} className="w-4" alt="mail" />
-              </div>
-            </div>
+          {!totpReq && qrCode === "" && (
+            <LoginForm
+              email={email}
+              setEmail={setEmail}
+              password={password}
+              setPassword={setPassword}
+              passwordState={passwordState}
+              setPasswordState={setPasswordState}
+              error={error}
+              shake={shake}
+              loginHandler={loginHandler}
+              navigate={navigate}
+            />
+          )}
 
-            {/* Password */}
-            <div>
-              <label className="text-sm text-black">Password</label>
-              <div className="flex items-center border rounded px-3 py-2">
-                <input
-                  type={passwordState === "hidden" ? "password" : "text"}
-                  placeholder="Password"
-                  className="bg-transparent outline-none w-full"
-                />
-                <img
-                  src={
-                    passwordState === "hidden"
-                      ? assets.password_show
-                      : assets.password_hide
-                  }
-                  className="w-4 cursor-pointer"
-                  alt="toggle password"
-                  onClick={() =>
-                    setPasswordState(
-                      passwordState === "hidden" ? "show" : "hidden"
-                    )
-                  }
-                />
-              </div>
-            </div>
-
-            {/* Login Button */}
-            <button className="w-full bg-[#150958] text-white py-2 rounded hover:bg-blue-700 transition">
-              Login
-            </button>
-          </form>
-
-          <p
-            onClick={() => {
-              navigate("reset-password");
-            }}
-            className="mt-4 text-sm text-[#150958] cursor-pointer"
-          >
-            Forgot password?
-          </p>
-
-          <p className="mt-6 text-sm text-gray-500">
-            Don’t have an account? Contact the system administrator.
-          </p>
+          {totpReq && (
+            <TwoFactorForm
+              inputRefs={inputRefs}
+              handlePaste={handlePaste}
+              handleInput={handleInput}
+              handleKeyDown={handleKeyDown}
+              loginHandler={loginHandler}
+              error={error}
+              shake={shake}
+              setShake={setShake}
+              totpActive={totpActive}
+              handleTotpLost={handleTotpLost}
+            />
+          )}
         </div>
       </div>
 

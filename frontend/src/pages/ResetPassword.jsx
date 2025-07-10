@@ -5,7 +5,7 @@ import { assets } from "../assets/assets";
 import { AppContext } from "../context/AppContext";
 
 const PasswordReset = () => {
-  const { backendUrl } = useContext(AppContext);
+  const { backendUrl, isLoggedin } = useContext(AppContext);
   const navigate = useNavigate();
   const [params] = useSearchParams();
 
@@ -110,7 +110,9 @@ const PasswordReset = () => {
       const t = setTimeout(() => navigate("/"), 5000);
       return () => clearTimeout(t);
     }
-  }, [requestDone, passwordResetDone, navigate]);
+
+    if (isLoggedin && navigate("/dashboard"));
+  }, [requestDone, passwordResetDone, isLoggedin]);
 
   /* -------------------------------------------------------------------------- */
   /* JSX                                                                        */
@@ -122,7 +124,8 @@ const PasswordReset = () => {
         <img
           src={assets.buixie_logo}
           alt="Logo"
-          className="absolute top-10 left-10 w-28"
+          className="absolute top-10 left-10 w-28 cursor-pointer"
+          onClick={() => navigate("/")}
         />
 
         {/* Card */}

@@ -1,0 +1,24 @@
+# Node modules
+frontend/node_modules/
+backend/node_modules/
+
+# Environment variables
+frontend/.env
+backend/.env
+
+# Build outputs
+frontend/dist/
+
+# Local config (optional – remove if intentional)
+backend/config/update.js
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# System files
+.DS_Store
+
+# Docker local override files
+*.local
