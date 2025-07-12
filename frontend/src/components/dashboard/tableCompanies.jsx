@@ -1,39 +1,124 @@
 import { useNavigate } from "react-router-dom";
+import { tableSorter } from "../tableSorter";
+import { useEffect, useState } from "react";
+import { ChevronUpIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 
 const TableCompanies = ({
-  companies,
+  companies: initialCompanies,
   loading,
   error,
   currentPage,
   rowsPerPage,
 }) => {
+  const [companies, setCompanies] = useState([]);
+  const [sortKey, setSortKey] = useState("createdAt");
+  const [sortDir, setSortDir] = useState("desc");
   const navigate = useNavigate();
 
+  const handleSort = (key) => {
+    const nextDir = sortKey === key && sortDir === "asc" ? "desc" : "asc";
+    const sorted = tableSorter(companies, key, nextDir);
+
+    setCompanies(sorted);
+    setSortKey(key);
+    setSortDir(nextDir);
+  };
+
+  useEffect(() => {
+    setCompanies(initialCompanies);
+  }, [initialCompanies]);
+
   return (
-    <div className="overflow-x-auto bg-white shadow rounded-lg">
-      <table className="min-w-full divide-y divide-gray-200">
+    <div className="overflow-x-auto w-full bg-white shadow rounded-lg">
+      <table className="min-w-[700px] w-full divide-y divide-gray-200">
         <thead className="bg-gray-100">
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               #
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Name
+            <th
+              onClick={() => handleSort("name")}
+              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-800 transition-colors"
+            >
+              <div className="flex items-center">
+                Name
+                {sortKey === "name" &&
+                  (sortDir === "asc" ? (
+                    <ChevronUpIcon className="h-4 w-4 ml-1" />
+                  ) : (
+                    <ChevronDownIcon className="h-4 w-4 ml-1" />
+                  ))}
+              </div>
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Industry
+            <th
+              onClick={() => handleSort("industry")}
+              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-800 transition-colors"
+            >
+              <div className="flex items-center">
+                Industry
+                {sortKey === "industry" &&
+                  (sortDir === "asc" ? (
+                    <ChevronUpIcon className="h-4 w-4 ml-1" />
+                  ) : (
+                    <ChevronDownIcon className="h-4 w-4 ml-1" />
+                  ))}
+              </div>
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Location
+            <th
+              onClick={() => handleSort("address.city")}
+              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-800 transition-colors"
+            >
+              <div className="flex items-center">
+                Location
+                {sortKey === "location" &&
+                  (sortDir === "asc" ? (
+                    <ChevronUpIcon className="h-4 w-4 ml-1" />
+                  ) : (
+                    <ChevronDownIcon className="h-4 w-4 ml-1" />
+                  ))}
+              </div>
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Status
+            <th
+              onClick={() => handleSort("status")}
+              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-800 transition-colors"
+            >
+              <div className="flex items-center">
+                Status
+                {sortKey === "status" &&
+                  (sortDir === "asc" ? (
+                    <ChevronUpIcon className="h-4 w-4 ml-1" />
+                  ) : (
+                    <ChevronDownIcon className="h-4 w-4 ml-1" />
+                  ))}
+              </div>
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Last update
+            <th
+              onClick={() => handleSort("updatedAt")}
+              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-800 transition-colors"
+            >
+              <div className="flex items-center">
+                Last update
+                {sortKey === "updatedAt" &&
+                  (sortDir === "asc" ? (
+                    <ChevronUpIcon className="h-4 w-4 ml-1" />
+                  ) : (
+                    <ChevronDownIcon className="h-4 w-4 ml-1" />
+                  ))}
+              </div>
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Created
+            <th
+              onClick={() => handleSort("createdAt")}
+              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-800 transition-colors"
+            >
+              <div className="flex items-center">
+                Created
+                {sortKey === "createdAt" &&
+                  (sortDir === "asc" ? (
+                    <ChevronUpIcon className="h-4 w-4 ml-1" />
+                  ) : (
+                    <ChevronDownIcon className="h-4 w-4 ml-1" />
+                  ))}
+              </div>
             </th>
           </tr>
         </thead>
@@ -63,7 +148,7 @@ const TableCompanies = ({
                 <tr
                   key={idx}
                   onClick={() => navigate(`/company/?id=${company._id}`)}
-                  className="cursor-pointer hover:bg-gray-100"
+                  className="cursor-pointer hover:bg-gray-200"
                 >
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                     {(currentPage - 1) * rowsPerPage + idx + 1}

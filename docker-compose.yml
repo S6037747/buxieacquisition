@@ -1,11 +1,24 @@
 version: "3.8"
 
 services:
+  caddy:
+    image: caddy:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - frontend
+      - backend
+
   frontend:
     build: ./frontend
     container_name: frontend
     ports:
-      - "80:80"
+      - "5173:5173"
     restart: always
 
   backend:
@@ -14,3 +27,7 @@ services:
     restart: always
     environment:
       - PORT=4000
+
+volumes:
+  caddy_data:
+  caddy_config:

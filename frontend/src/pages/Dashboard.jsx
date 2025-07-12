@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "../components/dashboard/header.jsx";
 import PageButtons from "../components/dashboard/pageButtons";
 import TableCompanies from "../components/dashboard/tableCompanies.jsx";
+import { tableSearch } from "../components/searchTable.jsx";
 
 const Dashboard = () => {
   const [companies, setCompanies] = useState([]);
@@ -12,7 +13,15 @@ const Dashboard = () => {
   const [error, setError] = useState(null);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredCompanies, setFilteredCompanies] = useState([]);
   const navigate = useNavigate();
+  const [tagInput, setTagInput] = useState("");
+  const [selectedTag, setSelectedTag] = useState(null);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const allTags = Array.from(
+    new Set(companies.flatMap((company) => company.tags))
+  );
   const {
     backendUrl,
     userData,
@@ -25,7 +34,6 @@ const Dashboard = () => {
   useEffect(() => {
     if (authLoading) return;
 
-    // Redirect if user is not logged in
     if (!isLoggedin) {
       navigate("/", { replace: true });
       return;
@@ -47,6 +55,40 @@ const Dashboard = () => {
     fetchCompanies();
   }, [authLoading, isLoggedin, backendUrl]);
 
+  useEffect(() => {
+    let filtered = companies;
+
+    if (searchTerm) {
+      filtered = tableSearch(filtered, searchTerm.toLowerCase(), [
+        "name",
+        "industry",
+        "address.city",
+        "status",
+      ]);
+    }
+
+    if (tagInput.trim()) {
+      const inputLower = tagInput.toLowerCase();
+      const matchingTags = allTags.filter((tag) =>
+        tag.toLowerCase().includes(inputLower)
+      );
+
+      if (matchingTags.length > 0) {
+        filtered = filtered.filter((company) =>
+          company.tags.some((tag) =>
+            matchingTags.some(
+              (match) => match.toLowerCase() === tag.toLowerCase()
+            )
+          )
+        );
+      } else {
+        filtered = [];
+      }
+    }
+
+    setFilteredCompanies(filtered);
+  }, [searchTerm, tagInput, companies]);
+
   // =====================================MAIN HTML WEBSITE================================================== //
 
   return (
@@ -63,24 +105,75 @@ const Dashboard = () => {
         the system administrator.
       </p>
       {/* ---------- Main ---------- */}
-      <main className="flex-1 overflow-y-auto p-6">
+      <main className="flex-1 overflow-y-auto p-6 overflow-x-hidden">
         <div className="flex flex-wrap items-center justify-between mb-4 gap-4">
           <h2 className="text-2xl font-semibold text-[#150958]">
             Business relations{" "}
             <span className="text-sm font-normal text-gray-500">
-              ({companies.length} results found)
+              ({filteredCompanies.length} results found)
             </span>
           </h2>
-          <div className="flex gap-3 items-center">
+          <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center w-full sm:w-auto">
+            <div className="relative">
+              <input
+                id="tag-search"
+                type="text"
+                value={tagInput}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setTagInput(value);
+                  const matchedTag = allTags.find((tag) =>
+                    tag.toLowerCase().startsWith(value.toLowerCase())
+                  );
+                  setSelectedTag(matchedTag || null);
+                }}
+                onFocus={() => setShowSuggestions(true)}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 100)}
+                placeholder="Search by tag"
+                className="border rounded-md px-3 py-2 w-full sm:w-60 focus:outline-none focus:ring-2 focus:ring-[#4338CA]"
+                autoComplete="off"
+              />
+              {showSuggestions && tagInput.length >= 0 && (
+                <ul className="absolute z-10 bg-white border border-gray-300 rounded-md w-full mt-1 shadow-md overflow-hidden">
+                  {[
+                    ...new Map(
+                      allTags
+                        .filter((tag) =>
+                          tag.toLowerCase().includes(tagInput.toLowerCase())
+                        )
+                        .map((tag) => [tag.toLowerCase(), tag])
+                    ).values(),
+                  ]
+                    .slice(0, 4)
+                    .map((originalTag) => {
+                      return (
+                        <li
+                          key={originalTag}
+                          onClick={() => {
+                            setSelectedTag(originalTag);
+                            setTagInput(originalTag);
+                          }}
+                          className="px-3 py-2 hover:bg-gray-200 cursor-pointer transition-colors duration-150"
+                        >
+                          {originalTag}
+                        </li>
+                      );
+                    })}
+                </ul>
+              )}
+            </div>
             <input
-              id="filter"
+              id="company-search"
               type="text"
+              autoComplete="off"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Find company"
-              className="border rounded-md px-3 py-2 w-60 focus:outline-none focus:ring-2 focus:ring-[#4338CA]"
+              className="border rounded-md px-3 py-2 w-full sm:w-60 focus:outline-none focus:ring-2 focus:ring-[#4338CA]"
             />
             <button
               onClick={() => navigate("/new-company")}
-              className="bg-[#150958] text-white px-4 py-2 rounded hover:bg-[#4338CA] transition"
+              className="bg-[#150958] text-white px-4 py-2 rounded hover:bg-[#4338CA] transition w-full sm:w-auto"
             >
               Add business contact
             </button>
@@ -90,7 +183,7 @@ const Dashboard = () => {
         <div className="flex flex-col gap-2 sm:flex-col sm:items-start mb-4"></div>
 
         <TableCompanies
-          companies={companies}
+          companies={filteredCompanies}
           loading={loading}
           error={error}
           currentPage={currentPage}
@@ -122,7 +215,7 @@ const Dashboard = () => {
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}
           rowsPerPage={rowsPerPage}
-          totalCompanies={companies.length}
+          totalCompanies={filteredCompanies.length}
         />
         <div className="mt-4 flex justify-center items-center">
           <p className="text-sm text-gray-500 flex items-center gap-1">

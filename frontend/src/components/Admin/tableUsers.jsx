@@ -8,6 +8,8 @@ import {
   EllipsisVerticalIcon,
   TrashIcon,
   LockOpenIcon,
+  ChevronUpIcon,
+  ChevronDownIcon,
   ChevronDoubleUpIcon,
   KeyIcon,
 } from "@heroicons/react/24/outline";
@@ -22,6 +24,48 @@ const TableUsers = ({ error, users, loading, currentPage, rowsPerPage }) => {
   const [userId, setUserId] = useState("");
   const [showConfirm, setShowConfirm] = useState(false);
   const [warningMessage, setWarningMessage] = useState("");
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortField, setSortField] = useState("name");
+  const [sortOrder, setSortOrder] = useState("desc");
+
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortOrder("asc");
+    }
+  };
+
+  const filteredUsers = users
+    ?.filter(
+      (user) =>
+        user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email?.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .sort((a, b) => {
+      let aValue = a[sortField];
+      let bValue = b[sortField];
+
+      if (sortField === "totpActive") {
+        aValue = aValue ? "true" : "false";
+        bValue = bValue ? "true" : "false";
+      } else if (sortField === "date") {
+        aValue = new Date(aValue);
+        bValue = new Date(bValue);
+      } else if (sortField === "invitedBy") {
+        aValue = userNames[aValue]?.toLowerCase() || "";
+        bValue = userNames[bValue]?.toLowerCase() || "";
+      } else {
+        aValue = aValue?.toString().toLowerCase() || "";
+        bValue = bValue?.toString().toLowerCase() || "";
+      }
+
+      if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
+      if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
+      return 0;
+    });
 
   const resetPasswordHandler = async (email) => {
     try {
@@ -154,6 +198,8 @@ const TableUsers = ({ error, users, loading, currentPage, rowsPerPage }) => {
               id="filter"
               type="text"
               placeholder="Find user"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="border rounded-md px-3 py-2 w-60 focus:outline-none focus:ring-2 focus:ring-[#4338CA]"
             />
             <button
@@ -172,23 +218,89 @@ const TableUsers = ({ error, users, loading, currentPage, rowsPerPage }) => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   #
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Name
+                <th
+                  onClick={() => handleSort("name")}
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                >
+                  <span className="inline-flex items-center gap-1">
+                    Name
+                    {sortField === "name" &&
+                      (sortOrder === "asc" ? (
+                        <ChevronUpIcon className="w-4 h-4 inline" />
+                      ) : (
+                        <ChevronDownIcon className="w-4 h-4 inline" />
+                      ))}
+                  </span>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Role
+                <th
+                  onClick={() => handleSort("role")}
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                >
+                  <span className="inline-flex items-center gap-1">
+                    Role
+                    {sortField === "role" &&
+                      (sortOrder === "asc" ? (
+                        <ChevronUpIcon className="w-4 h-4 inline" />
+                      ) : (
+                        <ChevronDownIcon className="w-4 h-4 inline" />
+                      ))}
+                  </span>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Email
+                <th
+                  onClick={() => handleSort("email")}
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                >
+                  <span className="inline-flex items-center gap-1">
+                    Email
+                    {sortField === "email" &&
+                      (sortOrder === "asc" ? (
+                        <ChevronUpIcon className="w-4 h-4 inline" />
+                      ) : (
+                        <ChevronDownIcon className="w-4 h-4 inline" />
+                      ))}
+                  </span>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  2FA Active
+                <th
+                  onClick={() => handleSort("totpActive")}
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                >
+                  <span className="inline-flex items-center gap-1">
+                    2FA Active
+                    {sortField === "totpActive" &&
+                      (sortOrder === "asc" ? (
+                        <ChevronUpIcon className="w-4 h-4 inline" />
+                      ) : (
+                        <ChevronDownIcon className="w-4 h-4 inline" />
+                      ))}
+                  </span>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Created
+                <th
+                  onClick={() => handleSort("date")}
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                >
+                  <span className="inline-flex items-center gap-1">
+                    Created
+                    {sortField === "date" &&
+                      (sortOrder === "asc" ? (
+                        <ChevronUpIcon className="w-4 h-4 inline" />
+                      ) : (
+                        <ChevronDownIcon className="w-4 h-4 inline" />
+                      ))}
+                  </span>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Invited by
+                <th
+                  onClick={() => handleSort("invitedBy")}
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                >
+                  <span className="inline-flex items-center gap-1">
+                    Invited by
+                    {sortField === "invitedBy" &&
+                      (sortOrder === "asc" ? (
+                        <ChevronUpIcon className="w-4 h-4 inline" />
+                      ) : (
+                        <ChevronDownIcon className="w-4 h-4 inline" />
+                      ))}
+                  </span>
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
               </tr>
@@ -212,7 +324,7 @@ const TableUsers = ({ error, users, loading, currentPage, rowsPerPage }) => {
                     {error}
                   </td>
                 </tr>
-              ) : users.length === 0 ? (
+              ) : filteredUsers.length === 0 ? (
                 <tr>
                   <td
                     colSpan="7"
@@ -222,7 +334,7 @@ const TableUsers = ({ error, users, loading, currentPage, rowsPerPage }) => {
                   </td>
                 </tr>
               ) : (
-                users
+                filteredUsers
                   .slice(
                     (currentPage - 1) * rowsPerPage,
                     currentPage * rowsPerPage
@@ -336,7 +448,9 @@ const TableUsers = ({ error, users, loading, currentPage, rowsPerPage }) => {
               />
               <div className="flex justify-end gap-2">
                 <button
-                  onClick={() => setShowInviteModal(false)}
+                  onClick={() => {
+                    setShowInviteModal(false);
+                  }}
                   className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
                 >
                   Cancel
@@ -344,9 +458,15 @@ const TableUsers = ({ error, users, loading, currentPage, rowsPerPage }) => {
                 <button
                   onClick={() => {
                     if (inviteEmail.trim()) {
-                      inviteUserHandler();
-                      setShowInviteModal(false);
-                      setInviteEmail("");
+                      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                      if (!emailRegex.test(inviteEmail)) {
+                        toast.error("Please enter a valid email.");
+                        return;
+                      } else {
+                        inviteUserHandler();
+                        setShowInviteModal(false);
+                        setInviteEmail("");
+                      }
                     } else {
                       toast.error("Please enter a valid email.");
                     }

@@ -68,7 +68,7 @@ const Admin = () => {
         rowsPerPage={rowsPerPage}
       />
 
-      <div className="flex flex-col items-begin mb-4 px-7">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center mb-4 px-7 gap-2">
         <div className="flex items-center gap-2">
           <label htmlFor="maxRows" className="text-sm text-gray-700">
             Rows:

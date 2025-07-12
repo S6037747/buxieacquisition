@@ -162,10 +162,11 @@ const Interactions = ({ company }) => {
                       <span className="font-semibold text-sm text-gray-800">
                         {name}
                       </span>
-                      <div className="flex items-center gap-1 text-xs text-gray-500">
+                      <div className="flex items-center gap-1 text-xs text-gray-500 flex-wrap">
                         {method.icon}
                         <span className={`px-2 py-0.5 rounded ${method.color}`}>
-                          via {method.text}
+                          <span className="hidden sm:inline">via </span>
+                          {method.text}
                         </span>
                       </div>
                     </div>
@@ -176,11 +177,19 @@ const Interactions = ({ company }) => {
                     <div className="relative flex items-center gap-1 text-sm text-gray-500">
                       <CalendarDaysIcon className="w-4 h-4" />
                       <span>
-                        {new Date(itx.date).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "2-digit",
-                          year: "numeric",
-                        })}
+                        <span className="sm:hidden">
+                          {new Date(itx.date).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "2-digit",
+                          })}
+                        </span>
+                        <span className="hidden sm:inline">
+                          {new Date(itx.date).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "2-digit",
+                            year: "numeric",
+                          })}
+                        </span>
                       </span>
                       {(userData?.userId === itx.userId ||
                         userData?.role === "admin") && (

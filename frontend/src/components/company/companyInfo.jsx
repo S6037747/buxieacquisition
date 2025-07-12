@@ -177,12 +177,12 @@ const CompanyInfo = ({ company }) => {
       <section className="bg-white p-6 rounded-lg shadow space-y-4">
         {!edit ? (
           <>
-            <div className="flex justify-between items-start">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">
                   {company.name}
                 </h1>
-                <p className="mt-1 text-sm text-gray-500">
+                <p className="mt-1 text-sm text-gray-500 max-w-lg">
                   {company.description ? company.description : "unknown"}
                 </p>
                 <div className="mt-2 flex items-center space-x-4">
@@ -200,7 +200,7 @@ const CompanyInfo = ({ company }) => {
                   </span>
                 </div>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2 sm:justify-end w-full sm:w-auto">
                 <button
                   onClick={() => {
                     setShowConfirm(true);
@@ -210,7 +210,7 @@ const CompanyInfo = ({ company }) => {
                         : "This will change the company status to active. Companies with active status can be approached as they are possibly interested in a collaboration."
                     );
                   }}
-                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                  className="flex items-center justify-center gap-2 px-4 py-1.5 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 w-full sm:w-auto"
                 >
                   <ArrowsUpDownIcon className="h-4 w-4" />
                   Change status
@@ -219,7 +219,7 @@ const CompanyInfo = ({ company }) => {
                   onClick={() => {
                     setEdit(true);
                   }}
-                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                  className="flex items-center justify-center gap-2 px-4 py-1.5 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 w-full sm:w-auto"
                 >
                   <PencilSquareIcon className="h-4 w-4" />
                   Edit
@@ -232,7 +232,7 @@ const CompanyInfo = ({ company }) => {
                       `This will permanently delete "${company.name}". This action cannot be undone.`
                     );
                   }}
-                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-lg hover:bg-red-700"
+                  className="flex items-center justify-center gap-2 px-4 py-1.5 text-sm font-medium text-white bg-red-600 border border-transparent rounded-lg hover:bg-red-700 w-full sm:w-auto"
                 >
                   <TrashIcon className="h-4 w-4" />
                   Delete
@@ -328,7 +328,7 @@ const CompanyInfo = ({ company }) => {
               <TagIcon className="h-5 w-5 text-gray-500" />
               Tags
             </h2>
-            <div className="flex flex-wrap gap-2 mb-4">
+            <div className="flex flex-wrap gap-2 overflow-hidden break-words mb-4">
               {(company?.tags || []).map((tag) => (
                 <span
                   key={tag}

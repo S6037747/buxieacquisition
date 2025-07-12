@@ -178,21 +178,21 @@ const Reminders = ({ company }) => {
           return (
             <div
               key={itx._id}
-              className={`relative flex justify-between gap-3 border rounded-md p-4 mb-4 shadow-sm ${bgClass}`}
+              className={`relative flex flex-wrap justify-between gap-3 border rounded-md p-4 mb-4 shadow-sm ${bgClass}`}
             >
               {/* left avatar + text */}
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-base">
+              <div className="flex flex-1 items-start gap-3 min-w-0">
+                <div className="min-w-[2.5rem] w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-base">
                   {initials}
                 </div>
-                <div>
+                <div className="flex flex-col min-w-0">
                   {/* top‑line name & badges */}
-                  <div className="flex flex-wrap items-center gap-2 mb-1">
+                  <div className="flex flex-wrap items-center gap-2 py-1">
                     <span className="font-semibold text-sm text-gray-900">
                       {name}
                     </span>
                     <span
-                      className={`text-xs px-2 py-0.5 rounded-full font-medium flex items-center gap-1 ${
+                      className={`hidden sm:flex text-xs px-2 py-0.5 rounded-full font-medium items-center gap-1 ${
                         priorityColors[itx.priority]
                       }`}
                     >
@@ -215,7 +215,7 @@ const Reminders = ({ company }) => {
 
                   {/* description */}
                   <p
-                    className={`text-sm ${
+                    className={`text-sm break-words py-1 ${
                       isCompleted
                         ? "line-through text-gray-500"
                         : "text-gray-800"
@@ -227,32 +227,36 @@ const Reminders = ({ company }) => {
                   {/* created on */}
                   <p className="text-xs text-gray-400 mt-1">
                     Created on{" "}
-                    {new Date(itx.created).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "2-digit",
-                      year: "numeric",
-                    })}
+                    <span>
+                      {new Date(itx.created).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "2-digit",
+                        year: window.innerWidth >= 640 ? "numeric" : undefined,
+                      })}
+                    </span>
                   </p>
                 </div>
               </div>
 
               {/* right: due‑date + menu */}
-              <div className="flex flex-col items-end">
-                <div className="relative flex items-center gap-1 text-sm text-gray-500">
-                  <CalendarDaysIcon className="w-4 h-4" />
-                  <span
-                    className={`${
-                      isOverdue && !itx.completed
-                        ? "text-red-600 font-semibold"
-                        : ""
-                    }`}
-                  >
-                    {new Date(itx.dueDate).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "2-digit",
-                      year: "numeric",
-                    })}
-                  </span>
+              <div className="flex flex-col items-end text-sm text-gray-500">
+                <div className="flex flex-row items-center gap-2">
+                  <div className="flex items-center gap-1">
+                    <CalendarDaysIcon className="w-4 h-4" />
+                    <span
+                      className={
+                        isOverdue && !itx.completed
+                          ? "text-red-600 font-semibold"
+                          : ""
+                      }
+                    >
+                      {new Date(itx.dueDate).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "2-digit",
+                        year: window.innerWidth >= 640 ? "numeric" : undefined,
+                      })}
+                    </span>
+                  </div>
                   {(userData?.userId === itx.userId ||
                     userData?.role === "admin") && (
                     <button
