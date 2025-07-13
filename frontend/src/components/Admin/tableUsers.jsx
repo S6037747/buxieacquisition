@@ -12,10 +12,19 @@ import {
   ChevronDownIcon,
   ChevronDoubleUpIcon,
   KeyIcon,
+  PaperAirplaneIcon,
 } from "@heroicons/react/24/outline";
 import WarningModel from "../company/warning";
+import { useNavigate } from "react-router-dom";
 
-const TableUsers = ({ error, users, loading, currentPage, rowsPerPage }) => {
+const TableUsers = ({
+  error,
+  users,
+  loading,
+  currentPage,
+  rowsPerPage,
+  refetchUsers,
+}) => {
   const [userNames, setUserNames] = useState({});
   const { backendUrl } = useContext(AppContext);
   const [menuOpenId, setMenuOpenId] = useState("");
@@ -28,6 +37,8 @@ const TableUsers = ({ error, users, loading, currentPage, rowsPerPage }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState("name");
   const [sortOrder, setSortOrder] = useState("desc");
+
+  const navigate = useNavigate();
 
   const handleSort = (field) => {
     if (sortField === field) {
@@ -94,9 +105,26 @@ const TableUsers = ({ error, users, loading, currentPage, rowsPerPage }) => {
         return toast.error(data.message);
       } else {
         toast.success(data.message);
+        refetchUsers && refetchUsers();
       }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
 
-      window.location.reload();
+  const resendInviteHandler = async (email) => {
+    try {
+      const { data } = await axios.post(`${backendUrl}/api/auth/invite`, {
+        email: email,
+        resend: true,
+      });
+
+      if (!data.success) {
+        return toast.error(data.message);
+      } else {
+        toast.success(data.message);
+        refetchUsers && refetchUsers();
+      }
     } catch (error) {
       toast.error(error.message);
     }
@@ -111,8 +139,8 @@ const TableUsers = ({ error, users, loading, currentPage, rowsPerPage }) => {
       if (!data.success) {
         toast.error(data.message);
       } else {
-        window.location.reload();
         toast.success(data.message);
+        refetchUsers && refetchUsers();
       }
     } catch (error) {
       toast.error(error.message);
@@ -129,8 +157,8 @@ const TableUsers = ({ error, users, loading, currentPage, rowsPerPage }) => {
       if (!data.success) {
         toast.error(data.message);
       } else {
-        window.location.reload();
         toast.success(data.message);
+        refetchUsers && refetchUsers();
       }
     } catch (error) {
       toast.error(error.message);
@@ -147,8 +175,8 @@ const TableUsers = ({ error, users, loading, currentPage, rowsPerPage }) => {
       if (!data.success) {
         toast.error(data.message);
       } else {
-        window.location.reload();
         toast.success(data.message);
+        refetchUsers && refetchUsers();
       }
     } catch (error) {
       toast.error(error.message);
@@ -389,15 +417,18 @@ const TableUsers = ({ error, users, loading, currentPage, rowsPerPage }) => {
                                 Delete
                               </button>
                             )}
-                            <button
-                              onClick={() => {
-                                resetPasswordHandler(user.email);
-                              }}
-                              className="w-full flex items-center gap-2 px-4 py-2 text-sm text-black hover:bg-gray-50"
-                            >
-                              <KeyIcon className="w-4 h-4" />
-                              Password reset
-                            </button>
+                            {user.isAccountVerified && (
+                              <button
+                                onClick={() => {
+                                  resetPasswordHandler(user.email);
+                                }}
+                                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-black hover:bg-gray-50"
+                              >
+                                <KeyIcon className="w-4 h-4" />
+                                Password reset
+                              </button>
+                            )}
+
                             {user.totpActive && (
                               <button
                                 onClick={() => {
@@ -409,6 +440,19 @@ const TableUsers = ({ error, users, loading, currentPage, rowsPerPage }) => {
                                 Reset 2FA
                               </button>
                             )}
+
+                            {!user.isAccountVerified && (
+                              <button
+                                onClick={() => {
+                                  resendInviteHandler(user.email);
+                                }}
+                                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-black hover:bg-gray-50"
+                              >
+                                <PaperAirplaneIcon className="w-4 h-4" />
+                                Resend invite
+                              </button>
+                            )}
+
                             {user.role === "user" && (
                               <button
                                 onClick={() => {

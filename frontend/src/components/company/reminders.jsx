@@ -15,7 +15,7 @@ const getInitials = (name = "") =>
     .join("")
     .toUpperCase();
 
-const Reminders = ({ company }) => {
+const Reminders = ({ company, fetchCompany }) => {
   const [userNames, setUserNames] = useState({});
   const [reminderId, setReminderId] = useState("");
   const { userData, backendUrl } = useContext(AppContext);
@@ -64,9 +64,13 @@ const Reminders = ({ company }) => {
       });
       if (!data.success) {
         return toast.error(data.message);
+      } else {
+        toast.success(data.message);
+        setAddReminder(false);
+        setDescription("");
+        setDueDate("");
+        fetchCompany();
       }
-
-      window.location.reload();
     } catch (error) {
       return toast.error(error.message);
     }
@@ -82,9 +86,11 @@ const Reminders = ({ company }) => {
 
       if (!data.success) {
         return toast.error(data.message);
+      } else {
+        toast.success(data.message);
+        fetchCompany();
+        setMenuOpenId(null);
       }
-
-      window.location.reload();
     } catch (error) {
       return toast.error(error.message);
     }
@@ -97,8 +103,10 @@ const Reminders = ({ company }) => {
       );
       if (!data.success) {
         return toast.error(data.message);
+      } else {
+        toast.success(data.message);
+        fetchCompany();
       }
-      window.location.reload();
     } catch (error) {
       return toast.error(error.message);
     }

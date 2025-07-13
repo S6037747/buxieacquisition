@@ -39,7 +39,7 @@ const getInitials = (name = "") =>
     .join("")
     .toUpperCase();
 
-const Interactions = ({ company }) => {
+const Interactions = ({ company, fetchCompany }) => {
   const [userNames, setUserNames] = useState({});
   const [interactionId, setInteractionId] = useState("");
   const { userData, backendUrl } = useContext(AppContext);
@@ -66,9 +66,12 @@ const Interactions = ({ company }) => {
       );
       if (!data.success) {
         return toast.error(data.message);
+      } else {
+        toast.success(data.message);
+        fetchCompany();
+        setAddInteraction(false);
+        setDescription("");
       }
-
-      window.location.reload();
     } catch (error) {
       return toast.error(error.message);
     }
@@ -83,9 +86,10 @@ const Interactions = ({ company }) => {
 
       if (!data.success) {
         return toast.error(data.message);
+      } else {
+        toast.success(data.message);
+        fetchCompany();
       }
-
-      window.location.reload();
     } catch (error) {
       return toast.error(error.message);
     }

@@ -18,15 +18,14 @@ import { useState } from "react";
 import { AppContext } from "../../context/AppContext";
 import WarningModel from "../company/warning";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
-const CompanyInfo = ({ company }) => {
+const CompanyInfo = ({ company, fetchCompany }) => {
   const navigate = useNavigate();
   const { backendUrl } = useContext(AppContext);
   const [edit, setEdit] = useState(false);
-  const [error, setError] = useState("");
   const [showConfirm, setShowConfirm] = useState(false);
   const [warningMessage, setWarningMessage] = useState("");
-  const [shake, setShake] = useState(false);
   const [formData, setFormData] = useState({
     companyId: company._id || "",
     name: company.name || "",
@@ -48,12 +47,6 @@ const CompanyInfo = ({ company }) => {
     },
     tags: company.tags?.join(",") || "",
   });
-
-  const triggerError = (msg) => {
-    setError(msg);
-    setShake(false);
-    requestAnimationFrame(() => setShake(true));
-  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -78,7 +71,7 @@ const CompanyInfo = ({ company }) => {
     e.preventDefault();
 
     if (formData.name.trim() === "") {
-      return triggerError("Company name is required");
+      return toast.error("Company name is required");
     }
 
     // Update tags field before sending
@@ -93,18 +86,18 @@ const CompanyInfo = ({ company }) => {
         formData
       );
       if (!data.success) {
-        return triggerError(data.message);
+        return toast.error(data.message);
+      } else {
+        setEdit(false);
+        fetchCompany();
+        toast.success(data.message);
       }
-
-      setEdit(false);
-      window.location.reload();
     } catch (error) {
-      return triggerError(error.message);
+      return toast.error(error.message);
     }
   };
 
   const cancelEdit = () => {
-    setError("");
     setFormData({
       companyId: company._id || "",
       name: company.name || "",
@@ -139,12 +132,12 @@ const CompanyInfo = ({ company }) => {
       });
 
       if (!data.success) {
-        return triggerError(data.message);
+        return toast.error(data.message);
       }
 
-      window.location.reload();
+      fetchCompany();
     } catch (error) {
-      return triggerError(error.message);
+      return toast.error(error.message);
     }
   };
 
@@ -157,12 +150,12 @@ const CompanyInfo = ({ company }) => {
       });
 
       if (!data.success) {
-        return triggerError(data.message);
+        return toast.error(data.message);
       }
 
       navigate("/dashboard");
     } catch (error) {
-      return triggerError(error.message);
+      return toast.error(error.message);
     }
   };
 
@@ -510,17 +503,6 @@ const CompanyInfo = ({ company }) => {
                   className="mt-1 block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500"
                 />
               </div>
-
-              {error && (
-                <p
-                  className={`mt-2 mb-4 text-sm text-red-600 ${
-                    shake ? "animate-shake" : ""
-                  }`}
-                  onAnimationEnd={() => setShake(false)}
-                >
-                  {error}
-                </p>
-              )}
 
               <div className="pt-4">
                 <button

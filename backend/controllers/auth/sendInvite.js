@@ -4,7 +4,7 @@ import crypto from "crypto";
 import { EMAIL_INVITE_TEMPLATE } from "../../config/emailTemplates.js";
 
 const invite = async (request, response) => {
-  const { email, userId } = request.body;
+  const { email, userId, resend } = request.body;
 
   if (!email) {
     return response.json({
@@ -16,7 +16,7 @@ const invite = async (request, response) => {
   try {
     const existingUser = await userModel.findOne({ email });
 
-    if (existingUser) {
+    if (existingUser && !resend) {
       return response.json({
         success: false,
         message: "User already exists.",
@@ -29,27 +29,34 @@ const invite = async (request, response) => {
       .update(rawToken)
       .digest("hex");
 
-    const user = new userModel({
-      email: email,
-      invitedBy: userId,
-      verifyToken: tokenHash,
-      verifyTokenExpireAt: Date.now() + 7 * 24 * 60 * 60 * 1000,
-    });
+    if (!resend) {
+      const user = new userModel({
+        email: email,
+        invitedBy: userId,
+        verifyToken: tokenHash,
+        verifyTokenExpireAt: Date.now() + 7 * 24 * 60 * 60 * 1000,
+      });
+
+      // User will be saved to the database
+      await user.save();
+    } else {
+      existingUser.verifyToken = tokenHash;
+      existingUser.verifyTokenExpireAt = Date.now() + 7 * 24 * 60 * 60 * 1000;
+
+      existingUser.save();
+    }
 
     const verifyUrl =
       `${process.env.CLIENT_URL || process.env.FRONTEND_URL}` +
       `/invite?token=${rawToken}`;
 
-    // User will be saved to the database
-    await user.save();
-
     const mailOptions = {
       from: process.env.SENDER_EMAIL,
       to: email,
       subject: "Invite to the Buixie Dashboard",
-      html: EMAIL_INVITE_TEMPLATE.replace(/{{link}}/, verifyUrl).replace(
-        /{{FRONTEND}}/g,
-        process.env.FRONTEND_URL
+      html: EMAIL_INVITE_TEMPLATE.replace(/{{url}}/, verifyUrl).replace(
+        /{{url}}/,
+        verifyUrl
       ),
     };
 

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { assets } from "../assets/assets";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useContext } from "react";
 import { AppContext } from "../context/AppContext";
@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import LoginForm from "../components/login/LoginForm";
 import QrcodeSetup from "../components/login/QrcodeSetup";
 import TwoFactorForm from "../components/login/TwoFactorForm";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const { backendUrl, isLoggedin } = useContext(AppContext);
@@ -143,8 +144,21 @@ const Login = () => {
       inputRefs.current[0].focus();
     }
     setError("");
-    if (isLoggedin && navigate("/dashboard"));
-  }, [totpReq, qrCode, isLoggedin]);
+  }, [totpReq, qrCode]);
+
+  useEffect(() => {
+    if (isLoggedin) {
+      navigate("/dashboard");
+    }
+  }, [isLoggedin]);
+
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.state?.toast) {
+      toast.success(location.state.toast);
+    }
+  }, [location]);
 
   return (
     <div className="flex h-screen overflow-hidden">

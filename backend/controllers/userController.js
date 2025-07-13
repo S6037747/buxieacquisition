@@ -33,6 +33,7 @@ export const getUserData = async (request, response) => {
         name: user.name,
         email: user.email,
         isAccountVerified: user.isAccountVerified,
+        totpActive: user.totpActive,
         role: user.role,
         userId: user._id,
       },

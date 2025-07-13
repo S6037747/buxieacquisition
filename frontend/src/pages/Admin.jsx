@@ -21,6 +21,17 @@ const Admin = () => {
     userData,
   } = useContext(AppContext);
 
+  // Move fetchUsers outside useEffect so it can be passed down
+  const fetchUsers = async () => {
+    try {
+      const { data } = await axios.get(`${backendUrl}/api/user/all-data`);
+      setUsers(data.users || []);
+      setError(null);
+    } catch (err) {
+      setError("Failed to fetch users. " + err.message);
+    }
+  };
+
   useEffect(() => {
     if (authLoading) return;
 
@@ -32,16 +43,6 @@ const Admin = () => {
     if (userData && userData.role !== "admin") {
       return navigate("/dashboard", { replace: true });
     }
-
-    const fetchUsers = async () => {
-      try {
-        const { data } = await axios.get(`${backendUrl}/api/user/all-data`);
-        setUsers(data.users || []);
-        setError(null);
-      } catch (err) {
-        setError("Failed to fetch users. " + err.message);
-      }
-    };
 
     fetchUsers();
   }, [authLoading, isLoggedin, backendUrl]);
@@ -66,6 +67,7 @@ const Admin = () => {
         error={error}
         currentPage={currentPage}
         rowsPerPage={rowsPerPage}
+        refetchUsers={fetchUsers}
       />
 
       <div className="flex flex-col sm:flex-row items-start sm:items-center mb-4 px-7 gap-2">

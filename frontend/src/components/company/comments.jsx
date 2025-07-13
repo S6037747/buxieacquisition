@@ -7,7 +7,7 @@ import { AppContext } from "../../context/AppContext";
 import WarningModel from "../company/warning";
 import { toast } from "react-toastify";
 
-const Comments = ({ company }) => {
+const Comments = ({ company, fetchCompany }) => {
   const comments = company.comments;
   const { backendUrl, userData } = useContext(AppContext);
   const [activeReplyIndex, setActiveReplyIndex] = useState(null);
@@ -39,9 +39,11 @@ const Comments = ({ company }) => {
       });
       if (!data.success) {
         return toast.error(data.message);
+      } else {
+        toast.success(data.message);
+        fetchCompany();
+        setComment("");
       }
-
-      window.location.reload();
     } catch (error) {
       return toast.error(error.message);
     }
@@ -60,9 +62,12 @@ const Comments = ({ company }) => {
       if (!data.success) {
         return toast.error(data.message);
       }
-      setCommentId("");
-      setReplyId("");
-      window.location.reload();
+      {
+        toast.success(data.message);
+        fetchCompany();
+        setCommentId("");
+        setReplyId("");
+      }
     } catch (error) {
       return toast.error(error.message);
     }
@@ -81,8 +86,13 @@ const Comments = ({ company }) => {
       if (!data.success) {
         return error.toast(data.message);
       }
-
-      window.location.reload();
+      {
+        toast.success(data.message);
+        fetchCompany();
+        setCommentId("");
+        setActiveReplyIndex(null);
+        setReply("");
+      }
     } catch (error) {
       return error.toast(error.message);
     }

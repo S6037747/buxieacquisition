@@ -22,6 +22,19 @@ const Company = () => {
     loading: authLoading,
   } = useContext(AppContext);
 
+  const fetchCompany = async () => {
+    try {
+      const { data } = await axios.get(
+        `${backendUrl}/api/company/data/${companyId}`
+      );
+      setCompany(data.company || "");
+      setError(null);
+    } catch (err) {
+      setError("Failed to fetch companies. " + err.message);
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
     // Block until auth check is complete
     if (authLoading) return;
@@ -32,19 +45,6 @@ const Company = () => {
       return;
     }
 
-    const fetchCompany = async () => {
-      try {
-        const { data } = await axios.get(
-          `${backendUrl}/api/company/data/${companyId}`
-        );
-        setCompany(data.company || "");
-        setError(null);
-      } catch (err) {
-        setError("Failed to fetch companies. " + err.message);
-        console.error(err);
-      }
-    };
-
     fetchCompany();
   }, [authLoading, isLoggedin, backendUrl]);
 
@@ -52,13 +52,13 @@ const Company = () => {
     <div className="min-h-screen bg-[#F9FAFB]">
       <Header />
       <main className="max-w-5xl mx-auto px-4 py-8 space-y-6">
-        <CompanyInfo company={company} />
+        <CompanyInfo company={company} fetchCompany={fetchCompany} />
 
-        <Interactions company={company} />
+        <Interactions company={company} fetchCompany={fetchCompany} />
 
-        <Reminders company={company} />
+        <Reminders company={company} fetchCompany={fetchCompany} />
 
-        <Comments company={company} />
+        <Comments company={company} fetchCompany={fetchCompany} />
       </main>
       <div className="mb-4 flex justify-center items-center">
         <p className="text-sm text-gray-500 flex items-center gap-1">

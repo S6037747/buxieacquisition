@@ -23,6 +23,14 @@ const sendResetToken = async (request, response) => {
       });
     }
 
+    if (!user.isAccountVerified) {
+      return response.json({
+        success: false,
+        message:
+          "User not activated yet. Activate your account through your invite.",
+      });
+    }
+
     const rawToken = crypto.randomBytes(32).toString("hex"); // 64-char token
     const tokenHash = crypto
       .createHash("sha256")
@@ -42,10 +50,9 @@ const sendResetToken = async (request, response) => {
       from: process.env.SENDER_EMAIL,
       to: user.email,
       subject: "Reset your password",
-      html: PASSWORD_RESET_TEMPLATE.replace(/{{link}}/g, verifyUrl).replace(
-        /{{FRONTEND}}/g,
-        process.env.FRONTEND_URL
-      ),
+      html: PASSWORD_RESET_TEMPLATE.replace(/{{url}}/, verifyUrl)
+        .replace(/{{user}}/, user.name)
+        .replace(/{{url}}/, verifyUrl),
     };
 
     await transporter.sendMail(mailOptions);
