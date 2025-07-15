@@ -9,13 +9,13 @@ import { useEffect } from "react";
 import { useContext } from "react";
 import { AppContext } from "../context/AppContext";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const Company = () => {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const companyId = params.get("id");
   const [company, setCompany] = useState("");
-  const [error, setError] = useState("");
   const {
     backendUrl,
     isLoggedin,
@@ -27,10 +27,17 @@ const Company = () => {
       const { data } = await axios.get(
         `${backendUrl}/api/company/data/${companyId}`
       );
-      setCompany(data.company || "");
-      setError(null);
+
+      if (!data.company) {
+        toast.error("Company not found.");
+        navigate("/dashboard", { replace: true });
+        return;
+      }
+
+      setCompany(data.company);
     } catch (err) {
-      setError("Failed to fetch companies. " + err.message);
+      toast.error("Failed to fetch company. " + err.message);
+      navigate("/dashboard", { replace: true });
       console.error(err);
     }
   };

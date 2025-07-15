@@ -25,7 +25,11 @@ const TableCompanies = ({
   };
 
   useEffect(() => {
-    setCompanies(initialCompanies);
+    // Sort initialCompanies by updatedAt desc before setting
+    const sorted = tableSorter(initialCompanies, "updatedAt", "desc");
+    setCompanies(sorted);
+    setSortKey("updatedAt");
+    setSortDir("desc");
   }, [initialCompanies]);
 
   return (
