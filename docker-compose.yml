@@ -19,8 +19,8 @@ services:
     container_name: mongodb
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: secret
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root123
     ports:
       - "27017:27017"
     volumes:
@@ -39,8 +39,8 @@ services:
     build: ./backend
     container_name: backend
     restart: always
-    environment:
-      - PORT=4000
+    ports:
+      - "4000:4000"
 
 volumes:
   caddy_data:

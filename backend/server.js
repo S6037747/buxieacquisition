@@ -18,7 +18,7 @@ app.use(cookieParser());
 const allowedOrigins = [
   "http://localhost:5173",
   "http://192.168.178.234:5173",
-  "https://buxieacquisition.nl",
+  "https://app.buixie.nl",
 ];
 
 app.use(
@@ -35,4 +35,6 @@ app.use("/api/auth", authRouter);
 app.use("/api/user", UserRouter);
 app.use("/api/company", CompanyRouter);
 
-app.listen(port, () => console.log(`Server started on PORT:${port}`));
+app.listen(port, "0.0.0.0", () =>
+  console.log(`Server started on PORT:${port}`)
+);
