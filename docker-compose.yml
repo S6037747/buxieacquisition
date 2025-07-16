@@ -14,6 +14,20 @@ services:
       - frontend
       - backend
 
+  mongodb:
+    image: mongo:6.0
+    container_name: mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: secret
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    depends_on:
+      - backend
+
   frontend:
     build: ./frontend
     container_name: frontend
@@ -31,3 +45,4 @@ services:
 volumes:
   caddy_data:
   caddy_config:
+  mongodb_data:
