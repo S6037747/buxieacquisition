@@ -13,7 +13,7 @@ const getUserData = async (request, response) => {
     if (!user) {
       return response.json({
         success: false,
-        message: "User not found",
+        message: "User not found.",
       });
     }
 

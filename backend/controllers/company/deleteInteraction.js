@@ -9,7 +9,7 @@ const deleteInteraction = async (request, response) => {
   if (!userId || !authUser) {
     return response.json({
       success: false,
-      message: "User not authenticated",
+      message: "User not authenticated.",
     });
   }
 
@@ -42,7 +42,7 @@ const deleteInteraction = async (request, response) => {
 
     return response.json({
       success: true,
-      message: "Interaction deleted",
+      message: "Interaction deleted.",
     });
   } catch (error) {
     response.json({

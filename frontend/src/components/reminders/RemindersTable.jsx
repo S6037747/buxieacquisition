@@ -154,7 +154,7 @@ const RemindersTable = ({
           </div>
         </div>
 
-        <div className="w-full bg-white shadow rounded-lg relative overflow-x-auto">
+        <div className=" -full bg-white shadow rounded-lg relative overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-100">
               <tr>
@@ -275,7 +275,7 @@ const RemindersTable = ({
                       onClick={() => {
                         navigate(`/company/?id=${i.companyId}`);
                       }}
-                      className="cursor-pointer hover:bg-gray-100"
+                      className="cursor-pointer  hover:bg-gray-100"
                     >
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                         {(currentPage - 1) * rowsPerPage + idx + 1}

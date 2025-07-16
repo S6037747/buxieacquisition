@@ -9,7 +9,7 @@ const patchUser = async (request, response) => {
     if (!user) {
       return response.json({
         success: false,
-        message: "User not authenticated",
+        message: "User not authenticated.",
       });
     }
 

@@ -9,7 +9,7 @@ const register = async (request, response) => {
     return response.json({
       success: false,
       tokenAuth: false,
-      message: "Missing details",
+      message: "Missing details.",
     });
   }
 
@@ -22,7 +22,7 @@ const register = async (request, response) => {
       return response.json({
         success: false,
         tokenAuth: false,
-        message: "Token invalid",
+        message: "Token invalid.",
       });
     }
 
@@ -30,7 +30,7 @@ const register = async (request, response) => {
       return response.json({
         success: false,
         tokenAuth: false,
-        message: "Token Expired",
+        message: "Token Expired, ask a admin for a new invite.",
       });
     }
 
@@ -38,7 +38,7 @@ const register = async (request, response) => {
       return response.json({
         success: false,
         tokenAuth: true,
-        message: "Token valid",
+        message: "Token valid.",
       });
     }
 

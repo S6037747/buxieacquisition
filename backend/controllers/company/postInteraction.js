@@ -9,7 +9,7 @@ const postInteraction = async (request, response) => {
   if (!userId || !authUser) {
     return response.json({
       success: false,
-      message: "User not authenticated",
+      message: "User not authenticated.",
     });
   }
 

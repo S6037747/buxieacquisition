@@ -10,14 +10,14 @@ export const deleteUser = async (request, response) => {
     if (requestUser.role !== "admin") {
       return response.json({
         success: false,
-        message: "Not Authorized",
+        message: "User not Authorized.",
       });
     }
 
     if (!user) {
       return response.json({
         success: false,
-        message: "User not found",
+        message: "User not found.",
       });
     }
 

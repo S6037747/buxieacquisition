@@ -9,7 +9,7 @@ const deleteComment = async (request, response) => {
   if (!userId || !authUser) {
     return response.json({
       success: false,
-      message: "User not authenticated",
+      message: "User not authenticated.",
     });
   }
 
@@ -28,7 +28,7 @@ const deleteComment = async (request, response) => {
     if (!comment) {
       return response.json({
         success: false,
-        message: "comment not found.",
+        message: "Comment not found.",
       });
     }
 
@@ -40,7 +40,7 @@ const deleteComment = async (request, response) => {
 
       return response.json({
         success: true,
-        message: "comment deleted",
+        message: "Comment deleted!",
       });
     } else {
       const reply = comment.replies.id(replyId);
@@ -48,7 +48,7 @@ const deleteComment = async (request, response) => {
       if (!reply) {
         return response.json({
           success: false,
-          message: "reply not found.",
+          message: "Reply not found.",
         });
       }
       comment.replies = comment.replies.filter(
@@ -58,7 +58,7 @@ const deleteComment = async (request, response) => {
 
       return response.json({
         success: true,
-        message: "reply deleted",
+        message: "Reply deleted.",
       });
     }
   } catch (error) {

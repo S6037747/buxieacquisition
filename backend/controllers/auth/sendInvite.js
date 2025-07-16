@@ -9,7 +9,7 @@ const invite = async (request, response) => {
   if (!email) {
     return response.json({
       success: false,
-      message: "Missing details",
+      message: "Missing details.",
     });
   }
 

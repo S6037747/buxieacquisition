@@ -10,7 +10,7 @@ export const login = async (request, response) => {
   if (!email || !password) {
     return response.json({
       success: false,
-      message: "Email or Password required",
+      message: "Email or Password required.",
     });
   }
 
@@ -21,7 +21,7 @@ export const login = async (request, response) => {
     if (!user) {
       return response.json({
         success: false,
-        message: "Invalid email or password",
+        message: "Invalid email or password.",
       });
     }
 
@@ -38,7 +38,7 @@ export const login = async (request, response) => {
     if (!isMatch) {
       return response.json({
         success: false,
-        message: "Invalid email or password",
+        message: "Invalid email or password.",
       });
     }
 
@@ -52,7 +52,7 @@ export const login = async (request, response) => {
     if (isFirstTimeSetup || wantsResetBeforeActivation) {
       // Generate TOTP secret
       const secret = speakeasy.generateSecret({
-        name: `BuxieAcquisition: ${user.email}`,
+        name: `Buxie: ${user.email}`,
       });
 
       // Save the base32 secret
@@ -65,7 +65,7 @@ export const login = async (request, response) => {
       // Return QR code + secret to frontend
       return response.json({
         success: false,
-        message: "Scan this QR code to complete 2FA setup",
+        message: "Scan this QR code to complete 2FA setup.",
         qrCode: qrCode,
         totpSecret: secret.base32,
       });
@@ -92,7 +92,7 @@ export const login = async (request, response) => {
         success: false,
         totpReq: true,
         totpActive: user.totpActive,
-        message: "2FA code is incorrect",
+        message: "2FA code is incorrect.",
       });
     }
 

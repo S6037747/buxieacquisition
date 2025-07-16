@@ -91,7 +91,7 @@ const Reminders = () => {
         totalCompanies={companies.length}
       />
 
-      <div className="mb-4 flex justify-center items-center">
+      <div className="mb-4 py-4 flex justify-center items-center">
         <p className="text-sm text-gray-500 flex items-center gap-1">
           <span>&copy;</span> 2025 Jeremy Zhou. All rights reserved.
         </p>

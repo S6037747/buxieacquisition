@@ -9,7 +9,7 @@ const sendResetToken = async (request, response) => {
   if (!email) {
     return response.json({
       success: false,
-      message: "Email is required",
+      message: "Email is required.",
     });
   }
 
@@ -19,7 +19,7 @@ const sendResetToken = async (request, response) => {
     if (!user) {
       return response.json({
         success: false,
-        message: "User not found",
+        message: "User not found.",
       });
     }
 
@@ -59,7 +59,7 @@ const sendResetToken = async (request, response) => {
 
     return response.json({
       success: true,
-      message: "Reset token email send to user",
+      message: "Reset token email send to user.",
     });
   } catch (error) {
     // Catch if a error occurs

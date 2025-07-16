@@ -10,7 +10,7 @@ const getCompanyData = async (request, response) => {
   if (!userId || !authUser) {
     return response.json({
       success: false,
-      message: "User not authenticated",
+      message: "User not authenticated.",
     });
   }
 
@@ -21,7 +21,7 @@ const getCompanyData = async (request, response) => {
       if (!company) {
         return response.json({
           success: false,
-          message: "Company not found",
+          message: "Company not found.",
         });
       }
 

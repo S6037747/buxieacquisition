@@ -9,7 +9,7 @@ const patchCompanyData = async (req, res) => {
   if (!data.userId || !authUser) {
     return response.json({
       success: false,
-      message: "User not authenticated",
+      message: "User not authenticated.",
     });
   }
 
@@ -53,7 +53,7 @@ const patchCompanyData = async (req, res) => {
 
     return res.json({
       success: true,
-      message: "Company updated successfully",
+      message: "Company updated successfully.",
     });
   } catch (error) {
     return res.json({

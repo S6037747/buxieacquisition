@@ -10,7 +10,7 @@ const patchReminder = async (req, res) => {
   if (!userId || !authUser) {
     return response.json({
       success: false,
-      message: "User not authenticated",
+      message: "User not authenticated.",
     });
   }
 

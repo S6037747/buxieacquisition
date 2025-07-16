@@ -9,7 +9,7 @@ export const admin = async (request, response) => {
     if (user.role !== "admin") {
       return response.json({
         success: false,
-        message: "Not Authorized",
+        message: "User not Authorized.",
       });
     }
 
@@ -21,7 +21,7 @@ export const admin = async (request, response) => {
       userAction.save();
       return response.json({
         success: true,
-        message: "2FA Reset, user can setup 2FA again after login.",
+        message: "Reset successfull! Setup of 2FA can be done after login.",
       });
     }
 
@@ -34,8 +34,6 @@ export const admin = async (request, response) => {
         message: "User promoted to admin.",
       });
     }
-
-    return response.json({ success: true, message: "User deleted." });
   } catch (error) {
     // Catch if a error occurs
     return response.json({

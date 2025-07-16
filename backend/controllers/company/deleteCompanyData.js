@@ -9,7 +9,7 @@ const deleteCompanyData = async (request, response) => {
   if (!data.userId || !authUser) {
     return response.json({
       success: false,
-      message: "User not authenticated",
+      message: "User not authenticated.",
     });
   }
 
@@ -20,7 +20,7 @@ const deleteCompanyData = async (request, response) => {
       if (!company) {
         return response.json({
           success: false,
-          message: "Company not found",
+          message: "Company not found.",
         });
       }
 
@@ -28,12 +28,12 @@ const deleteCompanyData = async (request, response) => {
 
       return response.json({
         success: true,
-        message: "Company deleted successfully",
+        message: "Company deleted successfully.",
       });
     } else {
       return response.json({
         success: false,
-        message: "Missing companyId",
+        message: "Missing companyId.",
       });
     }
   } catch (error) {
