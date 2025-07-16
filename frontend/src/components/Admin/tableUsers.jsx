@@ -239,7 +239,7 @@ const TableUsers = ({
           </div>
         </div>
 
-        <div className="w-full bg-white shadow rounded-lg relative overflow-x-auto">
+        <div className="w-full bg-white shadow rounded-lg relative">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-100">
               <tr>
