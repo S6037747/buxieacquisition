@@ -243,7 +243,9 @@ const InteractionsTable = ({
                         {userNames[i.userId] || i.userId}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                        {i.description}
+                        {i.description.length > 100
+                          ? i.description.slice(0, 100) + "..."
+                          : i.description}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                         {new Date(i.date).toLocaleDateString()}

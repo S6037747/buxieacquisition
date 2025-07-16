@@ -284,7 +284,9 @@ const RemindersTable = ({
                         {i.companyName || ""}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                        {i.description}
+                        {i.description.length > 100
+                          ? i.description.slice(0, 100) + "..."
+                          : i.description}
                       </td>
                       {view === "overdue" && (
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
