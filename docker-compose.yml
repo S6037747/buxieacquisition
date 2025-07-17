@@ -49,7 +49,6 @@ services:
       - mongodb
     volumes:
       - ./backups:/backups
-      - ./backups:/backups
       - ./backup.sh:/backup.sh
     entrypoint: ["/bin/sh", "-c", "/backup.sh"]
 
