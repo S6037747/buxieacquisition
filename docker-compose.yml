@@ -41,6 +41,8 @@ services:
     restart: always
     ports:
       - "4000:4000"
+    volumes:
+      - ./backend/backups:/app/backups
 
   mongo_backup:
     image: mongo
