@@ -7,6 +7,7 @@ import connectDB from "./config/mongodb.js";
 import authRouter from "./routes/authRoutes.js";
 import UserRouter from "./routes/userRoutes.js";
 import CompanyRouter from "./routes/companyRoutes.js";
+import "./jobs/reminderNotifier.js";
 
 const app = express();
 const port = process.env.PORT || 4000;

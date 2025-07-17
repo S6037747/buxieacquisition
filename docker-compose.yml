@@ -42,6 +42,20 @@ services:
     ports:
       - "4000:4000"
 
+  mongo_backup:
+    image: mongo
+    container_name: mongo_backup
+    depends_on:
+      - mongodb
+    volumes:
+      - ./backups:/backups
+    entrypoint:
+      [
+        "sh",
+        "-c",
+        "while true; do mongodump --uri='mongodb://root:root123@mongodb:27017/database?authSource=admin&directConnection=true' --out=/backups/$(date +%F-%H-%M); sleep 86400; done",
+      ]
+
 volumes:
   caddy_data:
   caddy_config:
