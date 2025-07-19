@@ -9,7 +9,7 @@ const logSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ["LoginAPI", "CompanyAPI", "Automated"],
+    enum: ["AuthAPI", "CompanyAPI", "Automated"],
   },
   method: {
     type: String,
