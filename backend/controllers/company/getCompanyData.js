@@ -30,24 +30,12 @@ const getCompanyData = async (request, response) => {
           message: "Company not found.",
         });
       }
-      await new logModel({
-        actionBy: userId,
-        type: "CompanyAPI",
-        method: "Get",
-        description: `Fetched company ${companyId} for user ${userId}`,
-      }).save();
       return response.json({
         success: true,
         company: company,
       });
     } else {
       const companies = await companyModel.find();
-      await new logModel({
-        actionBy: userId,
-        type: "CompanyAPI",
-        method: "Get",
-        description: `Fetched all companies for user ${userId}`,
-      }).save();
       return response.json({
         success: true,
         companies: companies,

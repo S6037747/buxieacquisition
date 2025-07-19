@@ -18,12 +18,6 @@ const getUserData = async (request, response) => {
       }).save();
       return response.json({ success: false, message: "User not found." });
     }
-    await new logModel({
-      actionBy: userId,
-      type: "CompanyAPI",
-      method: "Get",
-      description: `Fetched user data for user ${userId}`,
-    }).save();
     return response.json({ success: true, name: user.name });
   } catch (error) {
     await new logModel({
