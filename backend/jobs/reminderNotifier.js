@@ -3,10 +3,16 @@ import transporter from "../config/nodemailer.js";
 import companyModel from "../models/companyModel.js";
 import userModel from "../models/userModel.js";
 import { EMAIL_REMINDER_TEMPLATE } from "../config/emailTemplates.js";
+import logModel from "../models/logModel.js";
 
-console.log("Cronjob started, looking out for overdue reminders!");
+const log = new logModel({
+  type: "Automated",
+  description: `Cronjob started, will send reminders regarding overdue reminders.`,
+});
 
-cron.schedule("01 20 * * *", async () => {
+log.save();
+
+cron.schedule("30 08 * * *", async () => {
   const companies = await companyModel.find();
   const now = new Date();
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -34,12 +40,24 @@ cron.schedule("01 20 * * *", async () => {
   );
   console.log(`Found ${allReminders.length} reminders due today.`);
 
+  const summary = {
+    sentCount: 0,
+    recipients: [],
+  };
+
   for (const reminder of allReminders) {
     const user = await userModel.findById(reminder.userId);
     if (!user) {
-      return console.log(
-        "User does not exist anymore (" + reminder.userId + ")"
-      );
+      const log = new logModel({
+        type: "Automated",
+        method: "Post",
+        description:
+          "Reminder cannot be send. User does not exist anymore (" +
+          reminder.userId +
+          ")",
+      });
+
+      await log.save();
     } else {
       const formattedDate = new Date(reminder.dueDate).toLocaleDateString(
         "en-GB"
@@ -55,8 +73,17 @@ cron.schedule("01 20 * * *", async () => {
       };
 
       await transporter.sendMail(mailOptions);
-      console.log("email sent");
+      summary.sentCount += 1;
+      summary.recipients.push(user.email);
     }
   }
-  console.log("Email sequence ran! See you in 24 hours!");
+  const log = new logModel({
+    type: "Automated",
+    method: "Post",
+    description: `Summary: ${
+      summary.sentCount
+    } reminder mail(s) sent. Recipients: ${summary.recipients.join(", ")}`,
+  });
+
+  await log.save();
 });

@@ -8,6 +8,8 @@ import authRouter from "./routes/authRoutes.js";
 import UserRouter from "./routes/userRoutes.js";
 import CompanyRouter from "./routes/companyRoutes.js";
 import "./jobs/reminderNotifier.js";
+import logRouter from "./routes/logRoute.js";
+import logModel from "./models/logModel.js";
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -35,7 +37,13 @@ app.get("/", (req, res) => res.send("API is Working"));
 app.use("/api/auth", authRouter);
 app.use("/api/user", UserRouter);
 app.use("/api/company", CompanyRouter);
+app.use("/api/log", logRouter);
 
-app.listen(port, "0.0.0.0", () =>
-  console.log(`Server started on PORT:${port}`)
-);
+app.listen(port, "0.0.0.0", async () => {
+  const log = new logModel({
+    type: "Automated",
+    description: `Server started on PORT:${port}`,
+  });
+
+  await log.save();
+});
