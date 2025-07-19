@@ -1,5 +1,6 @@
 import companyModel from "../../models/companyModel.js";
 import userModel from "../../models/userModel.js";
+import logModel from "../../models/logModel.js";
 
 const patchCompanyData = async (req, res) => {
   const data = req.body;
@@ -50,12 +51,23 @@ const patchCompanyData = async (req, res) => {
     company.updatedAt = Date.now();
 
     await company.save();
-
+    await new logModel({
+      actionBy: data.userId,
+      type: "CompanyAPI",
+      method: "Patch",
+      description: `Updated company ${data.companyId} by user ${data.userId}`,
+    }).save();
     return res.json({
       success: true,
       message: "Company updated successfully.",
     });
   } catch (error) {
+    await new logModel({
+      actionBy: data.userId,
+      type: "CompanyAPI",
+      method: "Patch",
+      description: `Error updating company ${data.companyId} by user ${data.userId}: ${error.message}`,
+    }).save();
     return res.json({
       success: false,
       message: error.message,

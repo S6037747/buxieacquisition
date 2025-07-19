@@ -1,4 +1,5 @@
 import userModel from "../../models/userModel.js";
+import logModel from "../../models/logModel.js";
 
 export const admin = async (request, response) => {
   const { userId, totpReset, promote, userIdAction } = request.body;
@@ -7,6 +8,16 @@ export const admin = async (request, response) => {
     const user = await userModel.findById(userId);
 
     if (user.role !== "admin") {
+      const log = new logModel({
+        type: "CompanyAPI",
+        method: "Get",
+        actionBy: userId,
+        description:
+          "User tried accessing admin controls without the right authorization.",
+      });
+
+      await log.save();
+
       return response.json({
         success: false,
         message: "User not Authorized.",
@@ -18,7 +29,17 @@ export const admin = async (request, response) => {
     if (totpReset) {
       userAction.totpActive = false;
 
-      userAction.save();
+      await userAction.save();
+
+      const log = new logModel({
+        type: "CompanyAPI",
+        method: "Patch",
+        actionBy: userId,
+        description: `User resetted 2FA of user: ${userIdAction}.`,
+      });
+
+      await log.save();
+
       return response.json({
         success: true,
         message: "Reset successfull! Setup of 2FA can be done after login.",
@@ -29,6 +50,16 @@ export const admin = async (request, response) => {
       userAction.role = "admin";
 
       userAction.save();
+
+      const log = new logModel({
+        type: "CompanyAPI",
+        method: "Patch",
+        actionBy: userId,
+        description: `User promoted ${userIdAction} to admin.`,
+      });
+
+      await log.save();
+
       return response.json({
         success: true,
         message: "User promoted to admin.",
@@ -36,6 +67,14 @@ export const admin = async (request, response) => {
     }
   } catch (error) {
     // Catch if a error occurs
+    const log = new logModel({
+      type: "CompanyAPI",
+      actionBy: userId,
+      description: `The following error occured in admin.js: ${error.message}`,
+    });
+
+    await log.save();
+
     return response.json({
       success: false,
       message: error.message,

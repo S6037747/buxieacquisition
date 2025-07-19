@@ -1,16 +1,24 @@
-const isAuthenticated = async (request, response) => {
+import logModel from "../../models/logModel.js";
 
-    try {
-        return response.json({
-            success: true,
-        });
-    } catch (error) {
-        // Catch if a error occurs
-        return response.json({
-            success: false,
-            message: error.message
-        });
-    }
-}
+const isAuthenticated = async (request, response) => {
+  try {
+    return response.json({
+      success: true,
+    });
+  } catch (error) {
+    // Catch if a error occurs
+    const log = new logModel({
+      type: "AuthAPI",
+      description: `The following error has occured in the isAuthenticated.js: ${error.message}`,
+    });
+
+    await log.save();
+
+    return response.json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
 export default isAuthenticated;

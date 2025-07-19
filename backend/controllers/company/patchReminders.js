@@ -1,5 +1,6 @@
 import companyModel from "../../models/companyModel.js";
 import userModel from "../../models/userModel.js";
+import logModel from "../../models/logModel.js";
 
 const patchReminder = async (req, res) => {
   // NEW: pull fields directly from req.body
@@ -33,8 +34,20 @@ const patchReminder = async (req, res) => {
     reminder.completed = !!completed;
 
     await company.save();
+    await new logModel({
+      actionBy: userId,
+      type: "CompanyAPI",
+      method: "Patch",
+      description: `Updated reminder ${reminderId} to completed=${!!completed} for company ${companyId} by user ${userId}`,
+    }).save();
     return res.json({ success: true, message: "Reminder state updated." });
   } catch (err) {
+    await new logModel({
+      actionBy: userId,
+      type: "CompanyAPI",
+      method: "Patch",
+      description: `Error updating reminder ${reminderId} for company ${companyId} by user ${userId}: ${err.message}`,
+    }).save();
     return res.json({ success: false, message: err.message });
   }
 };

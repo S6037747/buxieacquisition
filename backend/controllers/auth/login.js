@@ -3,11 +3,21 @@ import jwt from "jsonwebtoken";
 import userModel from "../../models/userModel.js";
 import qrcode from "qrcode";
 import speakeasy from "speakeasy";
+import logModel from "../../models/logModel.js";
 
 export const login = async (request, response) => {
   const { email, password, totp, totpLost } = request.body;
 
   if (!email || !password) {
+    const log = new logModel({
+      type: "AuthAPI",
+      actionBy: user._id,
+      method: "Post",
+      description: `User tried to login without email and password. (bypassed frontend security)`,
+    });
+
+    await log.save();
+
     return response.json({
       success: false,
       message: "Email or Password required.",
@@ -19,6 +29,7 @@ export const login = async (request, response) => {
 
     // Checks password match and Checks if a user with a specific email exists
     if (!user) {
+      await log.save();
       return response.json({
         success: false,
         message: "Invalid email or password.",
@@ -26,6 +37,15 @@ export const login = async (request, response) => {
     }
 
     if (!user.name && !user.password) {
+      const log = new logModel({
+        type: "AuthAPI",
+        actionBy: user._id,
+        method: "Post",
+        description: `User tried to login but was denied due to pending invite.`,
+      });
+
+      await log.save();
+
       return response.json({
         success: false,
         message:
@@ -36,6 +56,14 @@ export const login = async (request, response) => {
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
+      const log = new logModel({
+        type: "AuthAPI",
+        actionBy: user._id,
+        method: "Post",
+        description: `User tried to login with incorrect password.`,
+      });
+
+      await log.save();
       return response.json({
         success: false,
         message: "Invalid email or password.",
@@ -62,6 +90,15 @@ export const login = async (request, response) => {
       // Generate QR code from otpauth URL
       const qrCode = await qrcode.toDataURL(secret.otpauth_url);
 
+      const log = new logModel({
+        type: "AuthAPI",
+        actionBy: user._id,
+        method: "Post",
+        description: `2FA setup was triggered.`,
+      });
+
+      await log.save();
+
       // Return QR code + secret to frontend
       return response.json({
         success: false,
@@ -72,6 +109,14 @@ export const login = async (request, response) => {
     }
 
     if (!totp) {
+      const log = new logModel({
+        type: "AuthAPI",
+        actionBy: user._id,
+        method: "Post",
+        description: `User send a login request without 2FA. (Bypassed frontend security)`,
+      });
+
+      await log.save();
       return response.json({
         success: false,
         totpReq: true,
@@ -88,6 +133,14 @@ export const login = async (request, response) => {
     });
 
     if (!isTotpValid) {
+      const log = new logModel({
+        type: "AuthAPI",
+        actionBy: user._id,
+        method: "Post",
+        description: `User tried to login with incorrect 2FA.`,
+      });
+
+      await log.save();
       return response.json({
         success: false,
         totpReq: true,
@@ -117,9 +170,26 @@ export const login = async (request, response) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
+    const log = new logModel({
+      type: "AuthAPI",
+      actionBy: user._id,
+      method: "Post",
+      description: `User logged-in succesfully!`,
+    });
+
+    await log.save();
+
     return response.json({ success: true });
   } catch (error) {
     // Catch if a error occurs
+    const log = new logModel({
+      type: "AuthAPI",
+      actionBy: user._id,
+      method: "Post",
+      description: `The following error has occured in login.js: ${error.message}`,
+    });
+
+    await log.save();
     return response.json({
       success: false,
       message: error.message,

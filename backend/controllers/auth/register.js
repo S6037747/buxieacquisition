@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import userModel from "../../models/userModel.js";
+import logModel from "../../models/logModel.js";
 
 const register = async (request, response) => {
   const { name, password, token } = request.body;
@@ -53,8 +54,25 @@ const register = async (request, response) => {
 
     await user.save();
 
+    const log = new logModel({
+      type: "AuthAPI",
+      actionBy: user._id,
+      method: "Post",
+      description: `User registerd succesfully after invite!`,
+    });
+
+    await log.save();
+
     return response.json({ success: true, message: "Account created." });
   } catch (error) {
+    const log = new logModel({
+      type: "AuthAPI",
+      actionBy: user._id,
+      method: "Post",
+      description: `The following error has occured in register.js: ${error.message}`,
+    });
+
+    await log.save();
     // Catch if a error occurs
     return response.json({
       success: false,

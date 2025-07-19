@@ -1,5 +1,6 @@
 import companyModel from "../../models/companyModel.js";
 import userModel from "../../models/userModel.js";
+import logModel from "../../models/logModel.js";
 
 const deleteCompanyData = async (request, response) => {
   const data = request.body || {};
@@ -25,7 +26,12 @@ const deleteCompanyData = async (request, response) => {
       }
 
       await companyModel.findByIdAndDelete(data.companyId);
-
+      await new logModel({
+        actionBy: data.userId,
+        type: "CompanyAPI",
+        method: "Delete",
+        description: `Deleted company ${data.companyId} by user ${data.userId}`,
+      }).save();
       return response.json({
         success: true,
         message: "Company deleted successfully.",
@@ -37,6 +43,12 @@ const deleteCompanyData = async (request, response) => {
       });
     }
   } catch (error) {
+    await new logModel({
+      actionBy: data.userId,
+      type: "CompanyAPI",
+      method: "Delete",
+      description: `Error deleting company ${data.companyId} by user ${data.userId}: ${error.message}`,
+    }).save();
     response.json({
       success: false,
       error: error.message,

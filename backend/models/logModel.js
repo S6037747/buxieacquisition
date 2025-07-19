@@ -13,7 +13,7 @@ const logSchema = new mongoose.Schema({
   },
   method: {
     type: String,
-    enum: ["Post", "Patch", "Delete"],
+    enum: ["Post", "Patch", "Delete", "Get"],
   },
   date: { type: Date, default: Date.now },
   description: { type: String },

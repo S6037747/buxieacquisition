@@ -1,5 +1,6 @@
 import companyModel from "../../models/companyModel.js";
 import userModel from "../../models/userModel.js";
+import logModel from "../../models/logModel.js";
 
 const postComment = async (request, response) => {
   const { companyId, userId, comment, reply, commentId } = request.body;
@@ -46,6 +47,12 @@ const postComment = async (request, response) => {
       });
 
       await company.save();
+      await new logModel({
+        actionBy: userId,
+        type: "CompanyAPI",
+        method: "Post",
+        description: `Added reply to comment ${commentId} for company ${companyId} by user ${userId}`,
+      }).save();
       return response.json({
         success: true,
         message: "Reply added.",
@@ -68,6 +75,12 @@ const postComment = async (request, response) => {
       company.updatedAt = Date.now();
 
       await company.save();
+      await new logModel({
+        actionBy: userId,
+        type: "CompanyAPI",
+        method: "Post",
+        description: `Added comment to company ${companyId} by user ${userId}`,
+      }).save();
       return response.json({
         success: true,
         message: "Comment added.",
@@ -79,6 +92,12 @@ const postComment = async (request, response) => {
       });
     }
   } catch (error) {
+    await new logModel({
+      actionBy: userId,
+      type: "CompanyAPI",
+      method: "Post",
+      description: `Error adding comment/reply for company ${companyId} by user ${userId}: ${error.message}`,
+    }).save();
     return response.json({
       success: false,
       message: error.message,

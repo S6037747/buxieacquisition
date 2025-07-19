@@ -2,11 +2,20 @@ import crypto from "crypto";
 import userModel from "../../models/userModel.js";
 import transporter from "../../config/nodemailer.js";
 import { PASSWORD_RESET_TEMPLATE } from "../../config/emailTemplates.js";
+import logModel from "../../models/logModel.js";
 
 const sendResetToken = async (request, response) => {
   const { email } = request.body;
 
   if (!email) {
+    const log = new logModel({
+      type: "AuthAPI",
+      method: "Post",
+      description: `User tried to reset password without email.`,
+    });
+
+    await log.save();
+
     return response.json({
       success: false,
       message: "Email is required.",
@@ -44,6 +53,15 @@ const sendResetToken = async (request, response) => {
       `${process.env.CLIENT_URL || process.env.FRONTEND_URL}` +
       `/reset-password?token=${rawToken}`;
 
+    const log = new logModel({
+      type: "AuthAPI",
+      actionBy: user._id,
+      method: "Post",
+      description: `User requested a password reset succesfully.`,
+    });
+
+    await log.save();
+
     await user.save();
 
     const mailOptions = {
@@ -63,6 +81,15 @@ const sendResetToken = async (request, response) => {
     });
   } catch (error) {
     // Catch if a error occurs
+    const log = new logModel({
+      type: "AuthAPI",
+      actionBy: userId,
+      method: "Post",
+      description: `The following error occured in sendResetToken.js: ${error.message}`,
+    });
+
+    await log.save();
+
     return response.json({
       success: false,
       message: error.message,

@@ -1,5 +1,6 @@
 import companyModel from "../../models/companyModel.js";
 import userModel from "../../models/userModel.js";
+import logModel from "../../models/logModel.js";
 
 const postCompanyData = async (request, response) => {
   const { company, userId } = request.body;
@@ -27,12 +28,23 @@ const postCompanyData = async (request, response) => {
 
   try {
     const newCompany = await companyModel.create(company);
-
+    await new logModel({
+      actionBy: userId,
+      type: "CompanyAPI",
+      method: "Post",
+      description: `Created company ${newCompany._id} by user ${userId}`,
+    }).save();
     return response.json({
       success: true,
       companyId: newCompany._id,
     });
   } catch (error) {
+    await new logModel({
+      actionBy: userId,
+      type: "CompanyAPI",
+      method: "Post",
+      description: `Error creating company by user ${userId}: ${error.message}`,
+    }).save();
     return response.json({
       success: false,
       error: error.message,

@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import userModel from "../../models/userModel.js";
+import logModel from "../../models/logModel.js";
 
 const resetPassword = async (request, response) => {
   const { token, newPassword } = request.body;
@@ -51,12 +52,29 @@ const resetPassword = async (request, response) => {
 
     await user.save();
 
+    const log = new logModel({
+      type: "AuthAPI",
+      actionBy: user._id,
+      method: "Patch",
+      description: `User resetted password succesfully!`,
+    });
+
+    await log.save();
+
     return response.json({
       success: true,
       message: "Password succesfully changed!",
     });
   } catch (error) {
     // Catch if a error occurs
+
+    const log = new logModel({
+      type: "AuthAPI",
+      actionBy: user._id,
+      method: "Patch",
+      description: `The following error occured in resetPassword.js: ${error.message}`,
+    });
+
     return response.json({
       success: false,
       message: error.message,

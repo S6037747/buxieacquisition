@@ -1,5 +1,6 @@
 import companyModel from "../../models/companyModel.js";
 import userModel from "../../models/userModel.js";
+import logModel from "../../models/logModel.js";
 
 const deleteComment = async (request, response) => {
   const { companyId, commentId, replyId, userId } = request.body || {};
@@ -37,14 +38,18 @@ const deleteComment = async (request, response) => {
         (c) => c._id.toString() !== commentId
       );
       await company.save();
-
+      await new logModel({
+        actionBy: userId,
+        type: "CompanyAPI",
+        method: "Delete",
+        description: `Deleted comment ${commentId} for company ${companyId} by user ${userId}`,
+      }).save();
       return response.json({
         success: true,
         message: "Comment deleted!",
       });
     } else {
       const reply = comment.replies.id(replyId);
-
       if (!reply) {
         return response.json({
           success: false,
@@ -55,13 +60,24 @@ const deleteComment = async (request, response) => {
         (r) => r._id.toString() !== replyId
       );
       await company.save();
-
+      await new logModel({
+        actionBy: userId,
+        type: "CompanyAPI",
+        method: "Delete",
+        description: `Deleted reply ${replyId} to comment ${commentId} for company ${companyId} by user ${userId}`,
+      }).save();
       return response.json({
         success: true,
         message: "Reply deleted.",
       });
     }
   } catch (error) {
+    await new logModel({
+      actionBy: userId,
+      type: "CompanyAPI",
+      method: "Delete",
+      description: `Error deleting comment/reply for company ${companyId} by user ${userId}: ${error.message}`,
+    }).save();
     response.json({
       success: false,
       message: error.message,

@@ -1,5 +1,6 @@
 import userModel from "../../models/userModel.js";
 import bcrypt from "bcryptjs";
+import logModel from "../../models/logModel.js";
 
 const patchUser = async (request, response) => {
   const { email, password, name, userId } = request.body;
@@ -7,6 +8,15 @@ const patchUser = async (request, response) => {
     const user = await userModel.findById(userId);
 
     if (!user) {
+      const log = new logModel({
+        type: "AuthAPI",
+        actionBy: userId,
+        method: "Patch",
+        description: `User tried to change profile info while nog being logged in.`,
+      });
+
+      await log.save();
+
       return response.json({
         success: false,
         message: "User not authenticated.",
@@ -14,6 +24,15 @@ const patchUser = async (request, response) => {
     }
 
     if (email) {
+      const log = new logModel({
+        type: "AuthAPI",
+        actionBy: userId,
+        method: "Patch",
+        description: `User changed mail from ${user.email} to ${email}.`,
+      });
+
+      await log.save();
+
       user.email = email;
       await user.save();
 
@@ -24,6 +43,15 @@ const patchUser = async (request, response) => {
     }
 
     if (name) {
+      const log = new logModel({
+        type: "AuthAPI",
+        actionBy: userId,
+        method: "Patch",
+        description: `User changed name from ${user.name} to ${name}.`,
+      });
+
+      await log.save();
+
       user.name = name;
       await user.save();
 
@@ -40,6 +68,15 @@ const patchUser = async (request, response) => {
       user.password = hashedPassword;
       await user.save();
 
+      const log = new logModel({
+        type: "AuthAPI",
+        actionBy: userId,
+        method: "Patch",
+        description: `User changed passport.`,
+      });
+
+      await log.save();
+
       return response.json({
         success: true,
         message: "Password successfully changed!",
@@ -47,6 +84,15 @@ const patchUser = async (request, response) => {
     }
   } catch (error) {
     // Catch if a error occurs
+    const log = new logModel({
+      type: "AuthAPI",
+      actionBy: userId,
+      method: "Patch",
+      description: `The following error has occured in PatchUser.js: ${error.message}`,
+    });
+
+    await log.save();
+
     return response.json({
       success: false,
       message: error.message,
