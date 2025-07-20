@@ -3,6 +3,7 @@ import axios from "axios";
 import { AppContext } from "../context/AppContext.jsx";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/dashboard/header.jsx";
+import { toast } from "react-toastify";
 
 const Export = () => {
   const [companies, setCompanies] = useState([]);
@@ -13,12 +14,19 @@ const Export = () => {
     loading: authLoading,
   } = useContext(AppContext);
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
   const [selectedFields, setSelectedFields] = useState([
     "name",
-    "email",
+    "description",
+    "website",
     "phone",
+    "email",
+    "industry",
+    "status",
+    "createdAt",
+    "updatedAt",
+    "contactPerson.name",
+    "contactPerson.phone",
+    "contactPerson.email",
     "address",
     "tags",
   ]);
@@ -40,11 +48,9 @@ const Export = () => {
 
     const fetchCompanies = async () => {
       try {
-        setLoading(true);
         const { data } = await axios.get(`${backendUrl}/api/company/data`);
         const comps = data.companies || [];
         setCompanies(comps);
-        setError(null);
         // derive tag list
         const normalizedTagMap = new Map();
         comps.forEach((c) => {
@@ -57,9 +63,7 @@ const Export = () => {
         });
         setAvailableTags([...normalizedTagMap.values()]);
       } catch (err) {
-        setError("Failed to fetch companies. " + err.message);
-      } finally {
-        setLoading(false);
+        toast.error("Failed to fetch companies. " + err.message);
       }
     };
 
@@ -122,8 +126,8 @@ const Export = () => {
           } else if (f === "tags") {
             val = (c.tags || []).join("; ");
           } else {
-            // simple path
-            val = (c[f] || "").toString();
+            // support nested fields
+            val = getValueByPath(c, f).toString();
           }
           // if date fields, format
           if (f === "createdAt" || f === "updatedAt") {
