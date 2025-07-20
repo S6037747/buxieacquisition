@@ -11,6 +11,7 @@ import Interactions from "./pages/Interactions.jsx";
 import Profile from "./pages/Profile.jsx";
 import Admin from "./pages/Admin.jsx";
 import Invite from "./pages/Invite.jsx";
+import Export from "./pages/Export.jsx";
 
 const App = () => {
   return (
@@ -27,6 +28,7 @@ const App = () => {
         <Route path="/interactions" element={<Interactions />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/admin" element={<Admin />} />
+        <Route path="/export" element={<Export />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </div>

@@ -190,7 +190,7 @@ const Dashboard = () => {
           rowsPerPage={rowsPerPage}
         />
 
-        <div className="flex flex-col items-begin mb-4 px-1 py-4">
+        <div className="flex flex-wrap justify-between items-center mb-4 gap-4 px-1 py-4">
           <div className="flex items-center gap-2">
             <label htmlFor="maxRows" className="text-sm text-gray-700">
               Rows:
@@ -210,6 +210,13 @@ const Dashboard = () => {
               <option value="50">50</option>
             </select>
           </div>
+
+          <button
+            onClick={() => navigate("/export")}
+            className="bg-[#150958] text-white px-4 py-2 rounded hover:bg-[#4338CA] transition w-full sm:w-auto"
+          >
+            Export contacts (CSV)
+          </button>
         </div>
         <PageButtons
           currentPage={currentPage}
