@@ -5,6 +5,13 @@ import logModel from "../../models/logModel.js";
 const patchCompanyData = async (req, res) => {
   const data = req.body;
 
+  // Trim whitespace from all string fields in the update payload
+  Object.keys(data).forEach((key) => {
+    if (typeof data[key] === "string") {
+      data[key] = data[key].trim();
+    }
+  });
+
   const authUser = await userModel.findById(data.userId);
 
   if (!data.userId || !authUser) {

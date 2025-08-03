@@ -5,6 +5,12 @@ import logModel from "../../models/logModel.js";
 const postCompanyData = async (request, response) => {
   const { company, userId } = request.body;
 
+  Object.keys(company).forEach((key) => {
+    if (typeof company[key] === "string") {
+      company[key] = company[key].trim();
+    }
+  });
+
   const authUser = await userModel.findById(userId);
 
   if (!userId || !authUser) {
