@@ -3,6 +3,7 @@ import CompanyInfo from "../components/company/companyInfo";
 import Interactions from "../components/company/interactions";
 import Reminders from "../components/company/reminders";
 import Comments from "../components/company/comments";
+import Progress from "../components/company/progress";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useState } from "react";
 import { useEffect } from "react";
@@ -60,6 +61,8 @@ const Company = () => {
       <Header />
       <main className="max-w-5xl mx-auto px-4 py-8 space-y-6">
         <CompanyInfo company={company} fetchCompany={fetchCompany} />
+
+        <Progress company={company} fetchCompany={fetchCompany} />
 
         <Interactions company={company} fetchCompany={fetchCompany} />
 

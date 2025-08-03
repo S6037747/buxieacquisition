@@ -12,7 +12,7 @@ const log = new logModel({
 
 log.save();
 
-cron.schedule("30 08 * * *", async () => {
+cron.schedule("* * * * *", async () => {
   const companies = await companyModel.find();
   const now = new Date();
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -48,16 +48,14 @@ cron.schedule("30 08 * * *", async () => {
   for (const reminder of allReminders) {
     const user = await userModel.findById(reminder.userId);
     if (!user) {
-      const log = new logModel({
+      await new logModel({
         type: "Automated",
         method: "Post",
         description:
           "Reminder cannot be send. User does not exist anymore (" +
           reminder.userId +
           ")",
-      });
-
-      await log.save();
+      }).save();
     } else {
       const formattedDate = new Date(reminder.dueDate).toLocaleDateString(
         "en-GB"
@@ -77,13 +75,11 @@ cron.schedule("30 08 * * *", async () => {
       summary.recipients.push(user.email);
     }
   }
-  const log = new logModel({
+  await new logModel({
     type: "Automated",
     method: "Post",
     description: `Summary: ${
       summary.sentCount
     } reminder mail(s) sent. Recipients: ${summary.recipients.join(", ")}`,
-  });
-
-  await log.save();
+  }).save;
 });

@@ -14,6 +14,7 @@ import userAuth from "../middleware/userAuth.js";
 import postReminder from "../controllers/company/postReminders.js";
 import patchReminder from "../controllers/company/patchReminders.js";
 import deleteReminder from "../controllers/company/deleteReminder.js";
+import postProgress from "../controllers/company/postProgress.js";
 
 const CompanyRouter = express.Router();
 
@@ -25,6 +26,7 @@ CompanyRouter.post("/data", userAuth, postCompanyData);
 CompanyRouter.post("/comment", userAuth, postComment);
 CompanyRouter.post("/interaction", userAuth, postInteraction);
 CompanyRouter.post("/reminder", userAuth, postReminder);
+CompanyRouter.post("/progress", userAuth, postProgress);
 CompanyRouter.patch("/data", userAuth, patchCompanyData);
 CompanyRouter.patch("/reminder", userAuth, patchReminder);
 CompanyRouter.delete("/data", userAuth, deleteCompanyData);

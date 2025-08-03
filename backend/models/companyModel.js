@@ -90,6 +90,17 @@ const companySchema = new mongoose.Schema({
       },
     },
   ],
+  progress: [
+    {
+      description: { type: String, required: true },
+      date: { type: String, required: true },
+      userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+      },
+    },
+  ],
   reminders: [
     {
       priority: { type: String, enum: ["low", "normal", "high", "urgent"] },
