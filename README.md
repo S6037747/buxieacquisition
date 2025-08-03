@@ -14,7 +14,6 @@ A lightweight B2B leads CRM application for tracking companies, interactions, pr
 - [Project Structure](#project-structure)
 - [API Endpoints](#api-endpoints)
 - [Contributing](#contributing)
-- [License](#license)
 
 ## Features
 
@@ -146,7 +145,3 @@ buxieacquisition/
 3. Commit your changes: `git commit -m 'feat: add your feature'`
 4. Push to the branch: `git push origin feature/your-feature`
 5. Open a Pull Request.
-
-## License
-
-MIT © Your Name
