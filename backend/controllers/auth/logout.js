@@ -10,7 +10,7 @@ const logout = async (request, response) => {
 
     const log = new logModel({
       type: "AuthAPI",
-      actionBy: user._id,
+      actionBy: request.userId,
       method: "Post",
       description: `User logged out!`,
     });
@@ -26,7 +26,7 @@ const logout = async (request, response) => {
 
     const log = new logModel({
       type: "AuthAPI",
-      actionBy: user._id,
+      actionBy: request.userId,
       method: "Post",
       description: `The following error has occured in logout.js: ${error.message}`,
     });

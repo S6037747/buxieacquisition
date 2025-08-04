@@ -20,6 +20,8 @@ const userSchema = new mongoose.Schema({
   role: { type: String, default: "user" },
 
   date: { type: Date, default: Date.now },
+  lastActive: { type: Date, default: Date.now },
+
   invitedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",

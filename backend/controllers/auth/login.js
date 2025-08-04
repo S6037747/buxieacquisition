@@ -109,14 +109,6 @@ export const login = async (request, response) => {
     }
 
     if (!totp) {
-      const log = new logModel({
-        type: "AuthAPI",
-        actionBy: user._id,
-        method: "Post",
-        description: `User send a login request without 2FA. (Bypassed frontend security)`,
-      });
-
-      await log.save();
       return response.json({
         success: false,
         totpReq: true,
@@ -156,6 +148,15 @@ export const login = async (request, response) => {
         user.totpActive = true;
         await user.save();
       }
+    }
+
+    const today = new Date().toDateString();
+    const lastActiveDay =
+      user.lastActive instanceof Date ? user.lastActive.toDateString() : "";
+
+    if (lastActiveDay !== today) {
+      user.lastActive = new Date();
+      await user.save();
     }
 
     // cookies
