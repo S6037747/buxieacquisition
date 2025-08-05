@@ -30,6 +30,8 @@ const postProgress = async (request, response) => {
       description: (description || "").trim(),
     });
 
+    company.updatedAt = Date.now();
+
     await company.save();
     await new logModel({
       actionBy: userId,
