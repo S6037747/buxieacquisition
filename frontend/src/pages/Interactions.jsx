@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useContext } from "react";
 import { AppContext } from "../context/AppContext";
 import Header from "../components/dashboard/header";
@@ -13,6 +13,16 @@ const Interactions = () => {
   const [error, setError] = useState("");
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+  const interactions = useMemo(() => {
+    const allInteractions = companies.flatMap((company) =>
+      company.interactions.map((interaction) => ({
+        ...interaction,
+        companyName: company.name,
+        companyId: company._id,
+      }))
+    );
+    return Array.from(new Set(allInteractions));
+  }, [companies]);
 
   const {
     backendUrl,
@@ -58,7 +68,7 @@ const Interactions = () => {
       {/* ---------- Main ---------- */}
       <InteractionsTable
         loading={authLoading}
-        companies={companies}
+        interactions={interactions}
         error={error}
         currentPage={currentPage}
         rowsPerPage={rowsPerPage}
@@ -89,7 +99,7 @@ const Interactions = () => {
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
         rowsPerPage={rowsPerPage}
-        totalCompanies={companies.length}
+        totalItems={interactions.length}
       />
 
       <div className="mt-4 flex justify-center items-center">

@@ -18,6 +18,18 @@ const Reminders = () => {
     isLoggedin,
     loading: authLoading,
   } = useContext(AppContext);
+  const reminders = useMemo(() => {
+    const allReminders = companies.flatMap((company) =>
+      company.reminders
+        .filter((reminder) => reminder.completed === false)
+        .map((reminder) => ({
+          ...reminder,
+          companyName: company.name,
+          companyId: company._id,
+        }))
+    );
+    return Array.from(new Set(allReminders));
+  }, [companies]);
 
   useEffect(() => {
     if (authLoading) return;
@@ -58,7 +70,7 @@ const Reminders = () => {
       <RemindersTable
         error={error}
         loading={authLoading}
-        companies={companies}
+        reminders={reminders}
         currentPage={currentPage}
         rowsPerPage={rowsPerPage}
       />
@@ -88,7 +100,7 @@ const Reminders = () => {
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
         rowsPerPage={rowsPerPage}
-        totalCompanies={companies.length}
+        totalItems={reminders.length}
       />
 
       <div className="mb-4 py-4 flex justify-center items-center">

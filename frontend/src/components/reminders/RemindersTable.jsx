@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 
 const RemindersTable = ({
   error,
-  companies,
+  reminders,
   loading,
   currentPage,
   rowsPerPage,
@@ -15,20 +15,6 @@ const RemindersTable = ({
   const [view, setView] = useState("mine");
   const [userNames, setUserNames] = useState({});
   const { backendUrl, userData } = useContext(AppContext);
-
-  const reminders = useMemo(() => {
-    const allReminders = companies.flatMap((company) =>
-      company.reminders
-        .filter((reminder) => reminder.completed === false)
-        .map((reminder) => ({
-          ...reminder,
-          companyName: company.name,
-          companyId: company._id,
-        }))
-    );
-    return Array.from(new Set(allReminders));
-  }, [companies]);
-
   const [searchTerm, setSearchTerm] = useState("");
   const [sortKey, setSortKey] = useState("due");
   const [sortDir, setSortDir] = useState("desc");

@@ -4,9 +4,12 @@ const PageButtons = ({
   currentPage,
   setCurrentPage,
   rowsPerPage,
-  totalCompanies,
+  totalItems,
 }) => {
-  const totalPages = Math.max(1, Math.ceil(totalCompanies / rowsPerPage));
+  const totalPages = Math.max(
+    1,
+    Math.ceil((totalItems || 0) / (rowsPerPage || 10))
+  );
 
   const getPageButtons = useMemo(() => {
     const buttons = [];

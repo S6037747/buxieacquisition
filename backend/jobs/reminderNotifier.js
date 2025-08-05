@@ -12,7 +12,7 @@ const log = new logModel({
 
 log.save();
 
-cron.schedule("* * * * *", async () => {
+cron.schedule("30 08 * * *", async () => {
   const companies = await companyModel.find();
   const now = new Date();
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -81,5 +81,5 @@ cron.schedule("* * * * *", async () => {
     description: `Summary: ${
       summary.sentCount
     } reminder mail(s) sent. Recipients: ${summary.recipients.join(", ")}`,
-  }).save;
+  }).save();
 });

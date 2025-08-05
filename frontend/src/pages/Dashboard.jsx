@@ -222,7 +222,7 @@ const Dashboard = () => {
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}
           rowsPerPage={rowsPerPage}
-          totalCompanies={filteredCompanies.length}
+          totalItems={filteredCompanies.length}
         />
         <div className="mt-4 flex justify-center items-center">
           <p className="text-sm text-gray-500 flex items-center gap-1">

@@ -1,6 +1,7 @@
 import logModel from "../models/logModel.js";
+import userModel from "../models/userModel.js";
 
-const createlog = async (request, response) => {
+export const createlog = async (request, response) => {
   try {
     const { actionBy, type, method, description } = request.body;
 
@@ -39,4 +40,36 @@ const createlog = async (request, response) => {
   }
 };
 
-export default createlog;
+export const getLogs = async (request, response) => {
+  try {
+    const { userId } = request.body;
+
+    const user = await userModel.findById(userId);
+
+    if (!user) {
+      return response.json({
+        success: false,
+        message: "User not Authenticated",
+      });
+    }
+
+    if (user.role !== "admin") {
+      return response.json({
+        success: false,
+        message: "User not Authorized",
+      });
+    }
+
+    const logs = await logModel.find();
+
+    return response.json({
+      success: true,
+      logs: logs,
+    });
+  } catch (error) {
+    return response.json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
